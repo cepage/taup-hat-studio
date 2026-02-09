@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${series.title})}">
+  <title>Series Detail</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <div class="section-header">
+      <h2 th:text="${series.title}">Series Title</h2>
+      <a href="/comics/">&larr; All Comics</a>
+    </div>
+
+    <p th:if="${series.description != null}" style="margin-bottom: 2rem; color: var(--color-text-muted); max-width: 720px;"
+       th:text="${series.description}">Description</p>
+
+    <div th:if="${issues.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+      <p>No issues published yet. Check back soon!</p>
+    </div>
+
+    <div class="card-grid">
+      <a class="card" th:each="issue : ${issues}"
+         th:href="'/comics/' + ${series.slug} + '/' + ${issue.issueNumber} + '/'">
+        <img th:if="${issue.coverImageUrl != null}"
+             th:src="${issue.coverImageUrl}"
+             th:alt="${issue.title}"
+             class="card-image">
+        <div class="card-body">
+          <h3>
+            <span th:text="'#' + ${issue.issueNumber}">
+              #1
+            </span>
+            &mdash;
+            <span th:text="${issue.title}">Issue Title</span>
+          </h3>
+          <p th:if="${issue.publishDate != null}" th:text="${issue.publishDate}" style="font-size: 0.85rem;">Date</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${series.title + ' #' + issue.issueNumber})}">
+  <title>Issue Reader</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <div class="reader-container">
+      <!-- Header -->
+      <div class="reader-header">
+        <h1>
+          <a th:href="'/comics/' + ${series.slug} + '/'" th:text="${series.title}">Series</a>
+          <span th:text="' #' + ${issue.issueNumber}"> #1</span>
+        </h1>
+        <p class="subtitle" th:text="${issue.title}">Issue Title</p>
+      </div>
+
+      <!-- Page viewport -->
+      <div class="reader-viewport" id="readerViewport">
+        <img id="readerImage" th:if="${!pages.isEmpty()}"
+             th:src="${pages[0].optimizedUrl != null ? pages[0].optimizedUrl : pages[0].imageUrl}"
+             th:alt="'Page 1'">
+        <p th:if="${pages.isEmpty()}" style="padding: 2rem; color: var(--color-text-muted);">
+          No pages available for this issue.
+        </p>
+      </div>
+
+      <!-- Page controls -->
+      <div th:if="${!pages.isEmpty()}" class="reader-controls">
+        <button class="btn btn-primary" id="prevPage" disabled>&larr; Prev</button>
+        <span class="page-indicator" id="pageIndicator">1 / <span th:text="${pages.size()}">1</span></span>
+        <button class="btn btn-primary" id="nextPage">&rarr; Next</button>
+      </div>
+
+      <!-- Issue navigation -->
+      <div class="reader-nav-issues">
+        <div>
+          <a th:if="${prevIssue != null}"
+             th:href="'/comics/' + ${series.slug} + '/' + ${prevIssue.issueNumber} + '/'"
+             class="btn btn-secondary">
+            &larr; Issue #<span th:text="${prevIssue.issueNumber}">0</span>
+          </a>
+        </div>
+        <div>
+          <a th:href="'/comics/' + ${series.slug} + '/'" class="btn btn-secondary">
+            All Issues
+          </a>
+        </div>
+        <div>
+          <a th:if="${nextIssue != null}"
+             th:href="'/comics/' + ${series.slug} + '/' + ${nextIssue.issueNumber} + '/'"
+             class="btn btn-secondary">
+            Issue #<span th:text="${nextIssue.issueNumber}">0</span> &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page data for JavaScript -->
+    <script th:if="${!pages.isEmpty()}" th:inline="javascript">
+      /*<![CDATA[*/
+      var comicPages = /*[[${pagesJson}]]*/ [];
+      /*]]>*/
+    </script>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <script src="/js/comic-reader.js"></script>
+</body>
+</html>

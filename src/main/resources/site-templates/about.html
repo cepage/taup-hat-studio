@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('About')}">
+  <title>About</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <div class="about-content">
+      <h1>About</h1>
+
+      <div th:if="${config.aboutText != null and !config.aboutText.isEmpty()}" class="about-text"
+           th:text="${config.aboutText}">
+        About text goes here.
+      </div>
+
+      <div th:if="${config.aboutText == null or config.aboutText.isEmpty()}"
+           style="color: var(--color-text-muted); padding: 2rem 0;">
+        <p>More information coming soon.</p>
+      </div>
+
+      <!-- Social links -->
+      <div th:if="${!socialLinks.isEmpty()}" class="social-links" style="margin-top: 2rem;">
+        <a th:each="link : ${socialLinks}"
+           th:href="${link.get('url')}"
+           class="social-link"
+           target="_blank"
+           rel="noopener">
+          <span th:text="${link.get('platform')}">Platform</span>
+        </a>
+      </div>
+
+      <!-- Store link -->
+      <div th:if="${config.bigcartelUrl != null and !config.bigcartelUrl.isEmpty()}" style="margin-top: 2rem;">
+        <a th:href="${config.bigcartelUrl}" class="btn btn-primary" target="_blank" rel="noopener">
+          Visit Shop &rarr;
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

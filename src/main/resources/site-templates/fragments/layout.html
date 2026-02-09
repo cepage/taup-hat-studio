@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Reusable layout fragments for the static site -->
+
+<!-- Head fragment with common meta, styles, fonts -->
+<head th:fragment="head(pageTitle)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="TaupHat Studio">
+  <title th:text="${pageTitle} + ' — ' + ${siteName}" />
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<!-- Site header with navigation -->
+<header th:fragment="header" class="site-header">
+  <div class="header-inner">
+    <a href="/" class="site-logo" th:text="${siteName}">Site Name</a>
+    <button class="hamburger" onclick="document.querySelector('.site-nav').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <nav class="site-nav">
+      <a href="/">Home</a>
+      <a href="/comics/">Comics</a>
+      <a href="/portfolio/">Portfolio</a>
+      <a href="/about/">About</a>
+      <a th:if="${config.bigcartelUrl != null and !config.bigcartelUrl.isEmpty()}"
+         th:href="${config.bigcartelUrl}" target="_blank" rel="noopener">Shop</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Site footer -->
+<footer th:fragment="footer" class="site-footer">
+  <p>&copy; <span th:text="${year}">2026</span> <span th:text="${siteName}">Site Name</span>. All rights reserved.</p>
+</footer>
+</html>

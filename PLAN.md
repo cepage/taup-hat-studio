@@ -247,7 +247,7 @@ Portfolio CRUD with image upload, image replacement, reorder, GCS asset lifecycl
 
 Color/font/image customization.
 
-### Phase 5: Static Site Generator -- PENDING
+### Phase 5: Static Site Generator -- COMPLETED
 
 Thymeleaf templates, HTML generation, comic reader JS, portfolio lightbox.
 
@@ -564,3 +564,96 @@ The editor is organized into six Material Design 3 outlined cards:
 - **Confirmation dialog**: Reuses existing `ConfirmDialog` before hero image removal
 - **Floating save FAB**: Fixed-position save button in the bottom-right corner for long pages
 - **Modern Angular**: Standalone component, `@if`/`@for` control flow, `FormsModule` with `ngModel` two-way binding, zoneless change detection
+
+---
+
+## Phase 5 Completed Work
+
+### Backend — `publish` Package
+
+```
+src/main/java/org/tanzu/thstudio/publish/
+├── SiteGeneratorConfig.java          # SpringTemplateEngine bean ("siteTemplateEngine") using SpEL
+├── SiteGeneratorService.java         # Core service: generates all HTML/CSS/JS, uploads to GCS staging
+├── SiteGeneratorController.java      # REST endpoints for generation and preview
+└── GeneratedSite.java                # In-memory representation of all generated files
+```
+
+### REST Endpoints
+
+| Method | URL | Purpose |
+|--------|-----|---------|
+| `POST` | `/api/publish/generate` | Generates static site and uploads to GCS staging (`site-staging/` prefix) |
+| `GET` | `/api/publish/preview-summary` | Generates site in-memory and returns file manifest (no upload) |
+
+### Thymeleaf Templates
+
+```
+src/main/resources/site-templates/
+├── fragments/
+│   └── layout.html                   # Shared head, header (navigation), and footer fragments
+├── home.html                         # Landing page: hero, latest comic, series grid, portfolio preview
+├── series-list.html                  # All active webcomic series as card grid
+├── series-detail.html                # Issue listing for a series (newest first)
+├── issue-reader.html                 # Sequential page reader with prev/next + keyboard navigation
+├── portfolio.html                    # Thumbnail grid with lightbox viewer
+└── about.html                        # Bio, social links, store link
+```
+
+Templates use a standalone Thymeleaf engine (separate from Spring MVC, which is disabled). All `@{...}` link expressions replaced with plain paths since the output is static HTML.
+
+### Static JavaScript Assets
+
+```
+src/main/resources/site-assets/
+├── comic-reader.js                   # Vanilla JS comic page reader
+└── portfolio-lightbox.js             # Vanilla JS lightbox gallery
+```
+
+**Comic Reader** (`comic-reader.js`):
+- Previous/Next page buttons with disabled state at boundaries
+- Keyboard navigation: Arrow Left/Right, A/D, Home/End
+- Click-to-advance: left third goes back, right two-thirds goes forward
+- Page indicator (e.g. "3 / 12")
+- Image preloading for smooth transitions
+- Auto-scroll to reader viewport on page change
+
+**Portfolio Lightbox** (`portfolio-lightbox.js`):
+- Click thumbnail to open full-screen overlay
+- Previous/Next navigation buttons
+- Keyboard navigation: Arrow Left/Right, Escape to close
+- Click overlay background to close
+- Image preloading for adjacent items
+- Caption display with title and description
+
+### Generated CSS
+
+The `style.css` is generated dynamically from `SiteConfig` theme values:
+- Google Fonts `@import` for heading and body fonts
+- CSS custom properties: `--color-primary`, `--color-secondary`, `--color-accent`, `--font-heading`, `--font-body`
+- Complete layout system: sticky header, responsive nav, card grids, thumbnail grids
+- Comic reader styles: viewport, controls, page indicator, issue navigation
+- Lightbox styles: overlay, navigation buttons, close button, captions
+- Responsive breakpoints: hamburger menu, adjusted grid columns at 768px
+- Modern CSS: `aspect-ratio`, `inset`, CSS Grid `auto-fill`, `flex-wrap`
+
+### Generated Static Site Structure
+
+| Page | URL Pattern | Template |
+|------|-------------|----------|
+| Home | `/index.html` | `home.html` |
+| Series List | `/comics/index.html` | `series-list.html` |
+| Series Detail | `/comics/{slug}/index.html` | `series-detail.html` |
+| Issue Reader | `/comics/{slug}/{issue}/index.html` | `issue-reader.html` |
+| Portfolio | `/portfolio/index.html` | `portfolio.html` |
+| About | `/about/index.html` | `about.html` |
+| Stylesheet | `/css/style.css` | (generated from config) |
+| Comic Reader JS | `/js/comic-reader.js` | (classpath resource) |
+| Portfolio Lightbox JS | `/js/portfolio-lightbox.js` | (classpath resource) |
+
+### Key Design Decisions
+
+- **SpringTemplateEngine with SpEL**: Uses `SpringTemplateEngine` with a `ClassLoaderTemplateResolver` (not Spring MVC's resolver) since Thymeleaf is disabled for web serving (`spring.thymeleaf.enabled=false`). `SpringTemplateEngine` uses `SpringStandardDialect` (SpEL expressions) rather than the plain `TemplateEngine`'s `StandardDialect` (OGNL expressions), avoiding the need for an extra OGNL dependency. The `siteTemplateEngine` bean is a separate, non-interfering template engine.
+- **Clean JavaScript data**: JPA entities are mapped to simple `LinkedHashMap` objects before being passed to Thymeleaf's inline JavaScript serialization, avoiding `LazyInitializationException` and `@JsonIgnore` issues.
+- **GCS staging prefix**: All generated files are uploaded under `site-staging/` in the GCS bucket. Previous staging files are cleared before each generation. This prefix is consumed by the publish pipeline (Phase 6).
+- **No framework**: The generated site uses only plain HTML, CSS, and vanilla JS for maximum performance and zero client-side dependencies.

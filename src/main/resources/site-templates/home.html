@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Home')}">
+  <title>Home</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <!-- Hero section -->
+    <section th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero">
+      <img th:src="${config.heroImageUrl}" alt="Hero" class="hero-image">
+      <div class="hero-overlay">
+        <h1 th:text="${siteName}">Site Name</h1>
+        <p th:if="${latestIssue != null}">
+          Latest: <a th:href="'/comics/' + ${latestIssueSeries.slug} + '/' + ${latestIssue.issueNumber} + '/'"
+                     th:text="${latestIssueSeries.title + ' #' + latestIssue.issueNumber + ' — ' + latestIssue.title}"
+                     style="color: #fff; text-decoration: underline;">Latest issue</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Latest comic section -->
+    <section th:if="${latestIssue != null}">
+      <div class="section-header">
+        <h2>Latest Comic</h2>
+        <a href="/comics/">View all comics &rarr;</a>
+      </div>
+      <div class="card-grid">
+        <a class="card" th:href="'/comics/' + ${latestIssueSeries.slug} + '/' + ${latestIssue.issueNumber} + '/'">
+          <img th:if="${latestIssue.coverImageUrl != null}"
+               th:src="${latestIssue.coverImageUrl}"
+               th:alt="${latestIssue.title}"
+               class="card-image">
+          <div class="card-body">
+            <h3 th:text="${latestIssueSeries.title + ' #' + latestIssue.issueNumber}">Series #1</h3>
+            <p th:text="${latestIssue.title}">Issue Title</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Comics series section -->
+    <section th:if="${!activeSeries.isEmpty()}" class="section-spacer">
+      <div class="section-header">
+        <h2>Comics</h2>
+        <a href="/comics/">View all &rarr;</a>
+      </div>
+      <div class="card-grid">
+        <a class="card" th:each="series : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'">
+          <img th:if="${series.coverImageUrl != null}"
+               th:src="${series.coverImageUrl}"
+               th:alt="${series.title}"
+               class="card-image">
+          <div class="card-body">
+            <h3 th:text="${series.title}">Series Title</h3>
+            <p th:if="${series.description != null}" th:text="${series.description}">Description</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Portfolio preview section -->
+    <section th:if="${!portfolioItems.isEmpty()}" class="section-spacer">
+      <div class="section-header">
+        <h2>Portfolio</h2>
+        <a href="/portfolio/">View all &rarr;</a>
+      </div>
+      <div class="thumbnail-grid">
+        <div class="thumbnail-item" th:each="item : ${portfolioItems}">
+          <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
+               th:alt="${item.title}">
+          <div class="thumbnail-caption" th:text="${item.title}">Item Title</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

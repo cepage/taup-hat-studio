@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Comics')}">
+  <title>Comics</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <div class="section-header">
+      <h2>Comics</h2>
+    </div>
+
+    <div th:if="${activeSeries.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+      <p>No comics available yet. Check back soon!</p>
+    </div>
+
+    <div class="card-grid">
+      <a class="card" th:each="series : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'">
+        <img th:if="${series.coverImageUrl != null}"
+             th:src="${series.coverImageUrl}"
+             th:alt="${series.title}"
+             class="card-image">
+        <div class="card-body">
+          <h3 th:text="${series.title}">Series Title</h3>
+          <p th:if="${series.description != null}" th:text="${series.description}">Description</p>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

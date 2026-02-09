@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <node.version>v24.13.0</node.version>
+        <node.version>v25.6.0</node.version>
         <google-cloud-storage.version>2.49.0</google-cloud-storage.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <java-cfenv.version>3.2.0</java-cfenv.version>
