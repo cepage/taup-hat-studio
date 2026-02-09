@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * REST API for static site generation.
+ * REST API for static site generation, preview, and deployment.
  * <p>
- * POST /api/publish/generate — generates the static site and uploads to GCS staging
- * GET  /api/publish/preview/{path} — (future) preview a generated page
+ * POST /api/publish/preview  — generates the site and deploys to a Firebase preview channel
+ * POST /api/publish/deploy   — generates the site and deploys to the Firebase live channel
+ * GET  /api/publish/preview-summary — generates in-memory and returns a file listing (no deploy)
  */
 @RestController
 @RequestMapping("/api/publish")
@@ -24,27 +25,32 @@ public class SiteGeneratorController {
     private static final Logger log = LoggerFactory.getLogger(SiteGeneratorController.class);
 
     private final SiteGeneratorService generatorService;
+    private final FirebaseHostingService firebaseHostingService;
 
-    public SiteGeneratorController(SiteGeneratorService generatorService) {
+    public SiteGeneratorController(SiteGeneratorService generatorService,
+                                   FirebaseHostingService firebaseHostingService) {
         this.generatorService = generatorService;
+        this.firebaseHostingService = firebaseHostingService;
     }
 
     /**
-     * Generates the complete static site and uploads all files to GCS staging.
-     * Returns a summary of the generation result.
+     * Generates the static site and deploys it to a Firebase preview channel.
+     * Returns the preview URL for the user to view the staged site.
      */
-    @PostMapping("/generate")
-    public ResponseEntity<Map<String, Object>> generate() {
-        log.info("Static site generation requested");
+    @PostMapping("/preview")
+    public ResponseEntity<Map<String, Object>> preview() {
+        log.info("Preview deployment requested");
         try {
-            int fileCount = generatorService.generateAndUpload();
+            var site = generatorService.generate();
+            String previewUrl = firebaseHostingService.deployToPreview(site);
             return ResponseEntity.ok(Map.of(
                     "status", "success",
-                    "fileCount", fileCount,
+                    "previewUrl", previewUrl,
+                    "fileCount", site.fileCount(),
                     "timestamp", LocalDateTime.now().toString()
             ));
         } catch (Exception e) {
-            log.error("Static site generation failed", e);
+            log.error("Preview deployment failed", e);
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "error",
                     "message", e.getMessage() != null ? e.getMessage() : "Unknown error",
@@ -54,7 +60,31 @@ public class SiteGeneratorController {
     }
 
     /**
-     * Generates the static site in-memory (without uploading) and returns a summary.
+     * Generates the static site and deploys it to the Firebase live channel (production).
+     */
+    @PostMapping("/deploy")
+    public ResponseEntity<Map<String, Object>> deploy() {
+        log.info("Production deployment requested");
+        try {
+            var site = generatorService.generate();
+            firebaseHostingService.deployToLive(site);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "fileCount", site.fileCount(),
+                    "timestamp", LocalDateTime.now().toString()
+            ));
+        } catch (Exception e) {
+            log.error("Production deployment failed", e);
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage() != null ? e.getMessage() : "Unknown error",
+                    "timestamp", LocalDateTime.now().toString()
+            ));
+        }
+    }
+
+    /**
+     * Generates the static site in-memory (without deploying) and returns a summary.
      * Useful for validating the site before publishing.
      */
     @GetMapping("/preview-summary")

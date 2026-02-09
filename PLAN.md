@@ -38,19 +38,16 @@ The system has two distinct halves:
                     │  ┌─────────────────┐  │
                     │  │  Cloud Storage  │  │
                     │  │  (images/assets)│  │
-                    │  └────────┬────────┘  │
-                    │           │            │
-                    │  ┌────────▼────────┐  │
-                    │  │  Cloud Build    │  │
-                    │  │  (deploy pipe)  │  │
-                    │  └────────┬────────┘  │
-                    │           │            │
-                    │  ┌────────▼────────┐  │
+                    │  └─────────────────┘  │
+                    │                       │
+                    │  ┌─────────────────┐  │
                     │  │ Firebase Hosting│  │
                     │  │ (static site)   │  │
                     │  └─────────────────┘  │
                     └───────────────────────┘
 ```
+
+Deployment from CMS to Firebase Hosting is direct via the Firebase Hosting REST API -- no Cloud Build or GCS staging bucket is needed.
 
 ### Technology Stack
 
@@ -64,7 +61,7 @@ The system has two distinct halves:
 | Database (local dev) | H2 in-memory | -- |
 | Image Storage | Google Cloud Storage | -- |
 | Static Hosting | Firebase Hosting | -- |
-| Deploy Pipeline | Google Cloud Build | -- |
+| Deploy Pipeline | Firebase Hosting REST API (direct) | -- |
 | Build System | Maven + Frontend Maven Plugin | -- |
 | Auth | Google OAuth2 | -- |
 
@@ -75,9 +72,8 @@ The system has two distinct halves:
 | Service | Provider | Purpose |
 |---------|----------|---------|
 | PostgreSQL | Cloud Foundry marketplace | CMS database (content, config, metadata) |
-| Cloud Storage | Google Cloud Platform | Images (originals, thumbnails, optimized) + generated static site files |
+| Cloud Storage | Google Cloud Platform | Images (originals, thumbnails, optimized) |
 | Firebase Hosting | Google Cloud Platform | Serve the public-facing static site with CDN |
-| Cloud Build | Google Cloud Platform | Deployment pipeline: push static files to Firebase |
 
 PostgreSQL is provided by Cloud Foundry's marketplace service (not Cloud SQL). Spring Boot auto-configures the datasource from the `VCAP_SERVICES` environment variable via `java-cfenv-boot`. For local development, H2 in-memory database is used.
 
@@ -205,13 +201,14 @@ The static site includes:
 
 ## Deployment Pipeline
 
-A Cloud Build configuration (`cloudbuild.yaml`) that:
+The CMS deploys directly to Firebase Hosting via the REST API:
 
-1. Is triggered via the Cloud Build API from the Spring Boot app when Aurora clicks "Publish"
-2. Syncs generated static files from a GCS staging bucket to Firebase Hosting
-3. Reports status back to the CMS
+1. `SiteGeneratorService.generate()` produces a `GeneratedSite` in memory (all HTML/CSS/JS)
+2. `FirebaseHostingService` creates a new version, uploads gzipped files with SHA-256 hashes, finalizes, and releases
+3. **Preview**: Deploys to a Firebase preview channel (temporary URL at `site--preview.web.app`) for staging review
+4. **Production**: Deploys to the live channel when Aurora clicks "Deploy to Production"
 
-A `firebase.json` configures Firebase Hosting (rewrites, headers, caching).
+No Cloud Build, no GCS staging bucket, no `cloudbuild.yaml`, no `firebase.json`. Hosting config (cache headers) is set programmatically in the version creation API call.
 
 ---
 
@@ -251,9 +248,9 @@ Color/font/image customization.
 
 Thymeleaf templates, HTML generation, comic reader JS, portfolio lightbox.
 
-### Phase 6: Publish Pipeline -- PENDING
+### Phase 6: Publish Pipeline -- COMPLETED
 
-Cloud Build integration, Firebase deployment, publish UI.
+Direct Firebase Hosting REST API deployment, preview channels, publish UI.
 
 ### Phase 7: Public Site Polish -- PENDING
 
@@ -283,7 +280,7 @@ Updated from the starter template. Key additions:
 src/main/java/org/tanzu/thstudio/
 ├── TaupHatStudioApplication.java          # @SpringBootApplication + @EnableConfigurationProperties
 ├── config/
-│   ├── TaupHatProperties.java             # @ConfigurationProperties record (security + gcs settings)
+│   ├── TaupHatProperties.java             # @ConfigurationProperties record (security + gcs + firebase settings)
 │   ├── SecurityConfig.java                # Google OAuth2 with email restriction + local dev mode
 │   ├── AuthController.java                # GET /api/auth/user -- returns current user info
 │   └── WebConfig.java                     # SPA forwarding (non-API routes -> index.html)
@@ -332,6 +329,7 @@ Key configuration properties:
 | `tauphat.security.local-mode` | `true` disables OAuth (for local dev) |
 | `tauphat.gcs.bucket-name` | GCS bucket for images/assets |
 | `tauphat.gcs.project-id` | GCP project ID |
+| `tauphat.firebase.site-id` | Firebase Hosting site ID for deployment |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth2 credentials (env vars) |
 
 ### Frontend Files Created
@@ -368,7 +366,10 @@ src/main/frontend/
         │   └── theme-editor/
         │       └── theme-editor.ts         # Placeholder (Phase 4)
         └── publish/
-            └── publish.ts                  # Placeholder (Phase 6)
+            ├── publish.ts                  # Publish component (built out in Phase 6)
+            ├── publish.html                # Publish template (Phase 6)
+            ├── publish.scss                # Publish styles (Phase 6)
+            └── publish.service.ts          # HTTP client for publish API (Phase 6)
 ```
 
 ### Build Verification
@@ -574,8 +575,9 @@ The editor is organized into six Material Design 3 outlined cards:
 ```
 src/main/java/org/tanzu/thstudio/publish/
 ├── SiteGeneratorConfig.java          # SpringTemplateEngine bean ("siteTemplateEngine") using SpEL
-├── SiteGeneratorService.java         # Core service: generates all HTML/CSS/JS, uploads to GCS staging
-├── SiteGeneratorController.java      # REST endpoints for generation and preview
+├── SiteGeneratorService.java         # Core service: generates all HTML/CSS/JS in memory
+├── SiteGeneratorController.java      # REST endpoints for preview, deploy, and validation
+├── FirebaseHostingService.java       # Deploys GeneratedSite to Firebase Hosting via REST API
 └── GeneratedSite.java                # In-memory representation of all generated files
 ```
 
@@ -583,8 +585,9 @@ src/main/java/org/tanzu/thstudio/publish/
 
 | Method | URL | Purpose |
 |--------|-----|---------|
-| `POST` | `/api/publish/generate` | Generates static site and uploads to GCS staging (`site-staging/` prefix) |
-| `GET` | `/api/publish/preview-summary` | Generates site in-memory and returns file manifest (no upload) |
+| `POST` | `/api/publish/preview` | Generates site and deploys to Firebase preview channel; returns preview URL |
+| `POST` | `/api/publish/deploy` | Generates site and deploys to Firebase live channel (production) |
+| `GET` | `/api/publish/preview-summary` | Generates site in-memory and returns file manifest (no deploy) |
 
 ### Thymeleaf Templates
 
@@ -655,5 +658,88 @@ The `style.css` is generated dynamically from `SiteConfig` theme values:
 
 - **SpringTemplateEngine with SpEL**: Uses `SpringTemplateEngine` with a `ClassLoaderTemplateResolver` (not Spring MVC's resolver) since Thymeleaf is disabled for web serving (`spring.thymeleaf.enabled=false`). `SpringTemplateEngine` uses `SpringStandardDialect` (SpEL expressions) rather than the plain `TemplateEngine`'s `StandardDialect` (OGNL expressions), avoiding the need for an extra OGNL dependency. The `siteTemplateEngine` bean is a separate, non-interfering template engine.
 - **Clean JavaScript data**: JPA entities are mapped to simple `LinkedHashMap` objects before being passed to Thymeleaf's inline JavaScript serialization, avoiding `LazyInitializationException` and `@JsonIgnore` issues.
-- **GCS staging prefix**: All generated files are uploaded under `site-staging/` in the GCS bucket. Previous staging files are cleared before each generation. This prefix is consumed by the publish pipeline (Phase 6).
+- **In-memory generation**: `SiteGeneratorService.generate()` returns a `GeneratedSite` object in memory. No intermediate GCS staging. The caller passes it to `FirebaseHostingService` for deployment.
+- **Issue titles, not numbers**: Templates display the issue title (e.g. "Moon 52") rather than inferring a display number (e.g. "#1"). The `issueNumber` field is used only for URL paths and ordering.
 - **No framework**: The generated site uses only plain HTML, CSS, and vanilla JS for maximum performance and zero client-side dependencies.
+
+---
+
+## Phase 6 Completed Work
+
+### Architecture Change
+
+Replaced the original three-hop publish path (Spring Boot -> GCS staging -> Cloud Build -> Firebase Hosting) with a single-hop direct deployment via the Firebase Hosting REST API. The `SiteGeneratorService` generates files in memory, and `FirebaseHostingService` deploys them directly. No GCS staging bucket, no Cloud Build, no `cloudbuild.yaml`, no `firebase.json`.
+
+### Backend — `publish` Package Updates
+
+**New: `FirebaseHostingService.java`** -- Deploys a `GeneratedSite` to Firebase Hosting via the REST API:
+
+- Uses `java.net.http.HttpClient` (Java 21 built-in) and `GoogleCredentials.getApplicationDefault()` for authentication
+- Implements the full Firebase Hosting deploy workflow:
+  1. Create version with hosting config (cache-control headers)
+  2. Populate files (sends `{"/path": "gzipSha256Hash"}` map)
+  3. Upload gzipped file bytes for each required hash
+  4. Finalize version and create release
+- `deployToPreview(GeneratedSite)` -- deploys to a `"preview"` channel, returns the preview URL
+- `deployToLive(GeneratedSite)` -- deploys to the `"live"` channel (production)
+- File preparation: gzip each file, then SHA-256 the gzipped content (Firebase's required format)
+- Validates `tauphat.firebase.site-id` is configured before attempting deployment
+
+**Modified: `SiteGeneratorController.java`** -- Replaced GCS staging endpoint with Firebase deployment endpoints:
+
+| Method | URL | Purpose |
+|--------|-----|---------|
+| `POST` | `/api/publish/preview` | Generates site + deploys to Firebase preview channel; returns `{status, previewUrl, fileCount}` |
+| `POST` | `/api/publish/deploy` | Generates site + deploys to Firebase live channel; returns `{status, fileCount}` |
+| `GET` | `/api/publish/preview-summary` | Generates in-memory, returns file listing (no deploy) -- unchanged |
+
+**Modified: `SiteGeneratorService.java`** -- Removed GCS staging logic:
+
+- Removed `generateAndUpload()` method
+- Removed `StorageService` dependency
+- Removed `STAGING_PREFIX` constant
+- `generate()` method unchanged -- returns `GeneratedSite` for the caller to deploy
+
+**Modified: `TaupHatProperties.java`** -- Added `FirebaseProperties` record:
+
+```java
+public record FirebaseProperties(String siteId) {}
+```
+
+### Configuration
+
+| Property | Purpose |
+|----------|---------|
+| `tauphat.firebase.site-id` | Firebase Hosting site ID (e.g. `tauphat-com`) |
+| `FIREBASE_SITE_ID` | Environment variable that maps to the above |
+
+Authentication uses Application Default Credentials (`GoogleCredentials.getApplicationDefault()`) with the `firebase.hosting` scope. The IAM principal needs the `roles/firebasehosting.admin` role.
+
+### Frontend — Publish UI
+
+**New: `publish.service.ts`** -- HTTP client service:
+
+- `generatePreview()` -- `POST /api/publish/preview`
+- `deployToProduction()` -- `POST /api/publish/deploy`
+- `getPreviewSummary()` -- `GET /api/publish/preview-summary`
+- Typed response interfaces: `PreviewResponse`, `DeployResponse`, `PreviewSummaryResponse`
+
+**Rebuilt: `publish.ts` / `publish.html` / `publish.scss`** -- Full publish component:
+
+- **Preview card**: "Generate Preview" button, indeterminate progress bar during generation, clickable preview URL link (opens in new tab), file count and timestamp display
+- **Deploy card**: "Deploy to Production" button with confirmation dialog, progress bar, last deploy status with file count and timestamp
+- **Error display**: Error card with icon when preview or deploy fails
+- **Signals-based state**: `previewing`, `deploying`, `previewUrl`, `lastPreview`, `lastDeploy`, `error`
+- **Snackbar notifications**: Success and error feedback via `MatSnackBar`
+- **Modern Angular**: Standalone component, `@if` control flow, signals, zoneless change detection
+
+**Modified: `confirm-dialog.ts`** -- Added optional `confirmLabel` field to `ConfirmDialogData` so the deploy confirmation dialog shows "Deploy" instead of "Delete".
+
+### No New Dependencies
+
+Everything uses libraries already on the classpath:
+
+- `java.net.http.HttpClient` -- built into Java 21
+- `com.google.auth.oauth2.GoogleCredentials` -- transitive via `google-cloud-storage`
+- `java.util.zip.GZIPOutputStream` -- built into Java
+- `java.security.MessageDigest` -- built into Java (SHA-256)

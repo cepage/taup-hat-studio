@@ -14,7 +14,7 @@
         <h1 th:text="${siteName}">Site Name</h1>
         <p th:if="${latestIssue != null}">
           Latest: <a th:href="'/comics/' + ${latestIssueSeries.slug} + '/' + ${latestIssue.issueNumber} + '/'"
-                     th:text="${latestIssueSeries.title + ' #' + latestIssue.issueNumber + ' — ' + latestIssue.title}"
+                     th:text="${latestIssueSeries.title + ' — ' + latestIssue.title}"
                      style="color: #fff; text-decoration: underline;">Latest issue</a>
         </p>
       </div>
@@ -33,7 +33,7 @@
                th:alt="${latestIssue.title}"
                class="card-image">
           <div class="card-body">
-            <h3 th:text="${latestIssueSeries.title + ' #' + latestIssue.issueNumber}">Series #1</h3>
+            <h3 th:text="${latestIssueSeries.title}">Series</h3>
             <p th:text="${latestIssue.title}">Issue Title</p>
           </div>
         </a>

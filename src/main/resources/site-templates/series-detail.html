@@ -27,13 +27,7 @@
              th:alt="${issue.title}"
              class="card-image">
         <div class="card-body">
-          <h3>
-            <span th:text="'#' + ${issue.issueNumber}">
-              #1
-            </span>
-            &mdash;
-            <span th:text="${issue.title}">Issue Title</span>
-          </h3>
+          <h3 th:text="${issue.title}">Issue Title</h3>
           <p th:if="${issue.publishDate != null}" th:text="${issue.publishDate}" style="font-size: 0.85rem;">Date</p>
         </div>
       </a>

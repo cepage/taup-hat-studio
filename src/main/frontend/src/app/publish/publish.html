@@ -1,0 +1,98 @@
+<h1>Publish Site</h1>
+<p class="subtitle">Preview and deploy your site to Firebase Hosting.</p>
+
+@if (error()) {
+  <mat-card appearance="outlined" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
+
+<div class="publish-grid">
+  <!-- Preview Section -->
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>preview</mat-icon>
+      <mat-card-title>Preview</mat-card-title>
+      <mat-card-subtitle>
+        Generate the site and deploy to a temporary preview URL
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (previewing()) {
+        <mat-progress-bar mode="indeterminate" />
+        <p class="status-text">Generating site and deploying preview...</p>
+      }
+
+      @if (previewUrl(); as url) {
+        <div class="preview-link">
+          <mat-icon>open_in_new</mat-icon>
+          <a [href]="url" target="_blank" rel="noopener noreferrer">{{ url }}</a>
+        </div>
+      }
+
+      @if (lastPreview(); as preview) {
+        <div class="status-detail">
+          <span class="label">Files:</span> {{ preview.fileCount }}
+          <span class="separator">|</span>
+          <span class="label">Generated:</span> {{ preview.timestamp }}
+        </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button
+        mat-flat-button
+        (click)="generatePreview()"
+        [disabled]="previewing() || deploying()"
+      >
+        <mat-icon>visibility</mat-icon>
+        Generate Preview
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Deploy Section -->
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>rocket_launch</mat-icon>
+      <mat-card-title>Deploy to Production</mat-card-title>
+      <mat-card-subtitle>
+        Generate the site and deploy to the live Firebase Hosting channel
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (deploying()) {
+        <mat-progress-bar mode="indeterminate" />
+        <p class="status-text">Generating site and deploying to production...</p>
+      }
+
+      @if (lastDeploy(); as deploy) {
+        <div class="status-detail success">
+          <mat-icon>check_circle</mat-icon>
+          <span>
+            Last deployed {{ deploy.fileCount }} files at {{ deploy.timestamp }}
+          </span>
+        </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="deployToProduction()"
+        [disabled]="previewing() || deploying()"
+      >
+        <mat-icon>rocket_launch</mat-icon>
+        Deploy to Production
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

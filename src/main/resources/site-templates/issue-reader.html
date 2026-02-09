@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head(${series.title + ' #' + issue.issueNumber})}">
+<head th:replace="~{fragments/layout :: head(${series.title + ' — ' + issue.title})}">
   <title>Issue Reader</title>
 </head>
 <body>
@@ -12,7 +12,6 @@
       <div class="reader-header">
         <h1>
           <a th:href="'/comics/' + ${series.slug} + '/'" th:text="${series.title}">Series</a>
-          <span th:text="' #' + ${issue.issueNumber}"> #1</span>
         </h1>
         <p class="subtitle" th:text="${issue.title}">Issue Title</p>
       </div>
@@ -40,7 +39,7 @@
           <a th:if="${prevIssue != null}"
              th:href="'/comics/' + ${series.slug} + '/' + ${prevIssue.issueNumber} + '/'"
              class="btn btn-secondary">
-            &larr; Issue #<span th:text="${prevIssue.issueNumber}">0</span>
+            &larr; <span th:text="${prevIssue.title}">Previous</span>
           </a>
         </div>
         <div>
@@ -52,7 +51,7 @@
           <a th:if="${nextIssue != null}"
              th:href="'/comics/' + ${series.slug} + '/' + ${nextIssue.issueNumber} + '/'"
              class="btn btn-secondary">
-            Issue #<span th:text="${nextIssue.issueNumber}">0</span> &rarr;
+            <span th:text="${nextIssue.title}">Next</span> &rarr;
           </a>
         </div>
       </div>

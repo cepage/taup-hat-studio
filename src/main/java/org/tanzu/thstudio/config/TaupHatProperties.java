@@ -3,7 +3,7 @@ package org.tanzu.thstudio.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tauphat")
-public record TaupHatProperties(SecurityProperties security, GcsProperties gcs) {
+public record TaupHatProperties(SecurityProperties security, GcsProperties gcs, FirebaseProperties firebase) {
 
     public record SecurityProperties(String allowedEmail, boolean localMode) {
         public SecurityProperties {
@@ -16,6 +16,12 @@ public record TaupHatProperties(SecurityProperties security, GcsProperties gcs) 
         public GcsProperties {
             if (bucketName == null) bucketName = "tauphat-assets";
             if (projectId == null) projectId = "";
+        }
+    }
+
+    public record FirebaseProperties(String siteId) {
+        public FirebaseProperties {
+            if (siteId == null) siteId = "";
         }
     }
 }

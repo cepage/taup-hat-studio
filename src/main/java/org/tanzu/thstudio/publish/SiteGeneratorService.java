@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tanzu.thstudio.image.StorageService;
 import org.tanzu.thstudio.portfolio.PortfolioItem;
 import org.tanzu.thstudio.portfolio.PortfolioItemRepository;
 import org.tanzu.thstudio.site.SiteConfig;
@@ -35,15 +34,14 @@ import java.util.Map;
  * Uses Thymeleaf templates to render HTML pages and produces CSS/JS assets
  * driven by the site configuration (colors, fonts, etc.).
  *
- * Generated files are uploaded to GCS under a staging prefix so that
- * the publish pipeline can deploy them to Firebase Hosting.
+ * The generated {@link GeneratedSite} is returned in-memory for the caller
+ * (typically the controller) to pass to {@link FirebaseHostingService} for deployment.
  */
 @Service
 @Transactional(readOnly = true)
 public class SiteGeneratorService {
 
     private static final Logger log = LoggerFactory.getLogger(SiteGeneratorService.class);
-    private static final String STAGING_PREFIX = "site-staging/";
 
     private final TemplateEngine templateEngine;
     private final SiteConfigService siteConfigService;
@@ -51,7 +49,6 @@ public class SiteGeneratorService {
     private final WebcomicIssueRepository issueRepository;
     private final WebcomicPageRepository pageRepository;
     private final PortfolioItemRepository portfolioRepository;
-    private final StorageService storageService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SiteGeneratorService(
@@ -60,15 +57,13 @@ public class SiteGeneratorService {
             WebcomicSeriesRepository seriesRepository,
             WebcomicIssueRepository issueRepository,
             WebcomicPageRepository pageRepository,
-            PortfolioItemRepository portfolioRepository,
-            StorageService storageService) {
+            PortfolioItemRepository portfolioRepository) {
         this.templateEngine = templateEngine;
         this.siteConfigService = siteConfigService;
         this.seriesRepository = seriesRepository;
         this.issueRepository = issueRepository;
         this.pageRepository = pageRepository;
         this.portfolioRepository = portfolioRepository;
-        this.storageService = storageService;
     }
 
     /**
@@ -116,27 +111,6 @@ public class SiteGeneratorService {
 
         log.info("Static site generation complete: {} files", site.fileCount());
         return site;
-    }
-
-    /**
-     * Generates the site and uploads all files to GCS staging.
-     * Returns the number of files uploaded.
-     */
-    public int generateAndUpload() {
-        var site = generate();
-
-        // Clear previous staging files
-        storageService.deleteByPrefix(STAGING_PREFIX);
-
-        // Upload all generated files
-        for (var entry : site.getFiles().entrySet()) {
-            String path = STAGING_PREFIX + entry.getKey();
-            var file = entry.getValue();
-            storageService.upload(path, file.content(), file.contentType());
-        }
-
-        log.info("Uploaded {} files to GCS staging prefix '{}'", site.fileCount(), STAGING_PREFIX);
-        return site.fileCount();
     }
 
     // ── Template rendering methods ──────────────────────────────────────────
