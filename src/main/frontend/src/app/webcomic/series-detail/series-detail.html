@@ -1,0 +1,88 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading...</span>
+  </div>
+} @else if (series(); as s) {
+  <div class="header">
+    <div class="header-left">
+      <a mat-icon-button routerLink="/webcomics" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <div>
+        <h1>{{ s.title }}</h1>
+        <p class="subtitle">
+          {{ issues().length }} issue{{ issues().length !== 1 ? 's' : '' }}
+          @if (!s.active) {
+            <span class="inactive-badge">Inactive</span>
+          }
+        </p>
+      </div>
+    </div>
+    <div class="actions">
+      <button mat-button (click)="editSeries()">
+        <mat-icon>edit</mat-icon>
+        Edit Series
+      </button>
+      <button mat-fab extended (click)="createIssue()">
+        <mat-icon>add</mat-icon>
+        New Issue
+      </button>
+    </div>
+  </div>
+
+  @if (issues().length === 0) {
+    <div class="empty-state">
+      <mat-icon>auto_stories</mat-icon>
+      <h2>No issues yet</h2>
+      <p>Create the first issue for this series.</p>
+      <button mat-flat-button (click)="createIssue()">
+        <mat-icon>add</mat-icon>
+        Create Issue
+      </button>
+    </div>
+  } @else {
+    <div class="issue-grid">
+      @for (issue of issues(); track issue.id) {
+        <mat-card appearance="outlined" class="issue-card">
+          @if (issue.coverImageUrl) {
+            <img mat-card-image [src]="issue.coverImageUrl" [alt]="issue.title" />
+          } @else {
+            <div class="placeholder-image">
+              <mat-icon>auto_stories</mat-icon>
+            </div>
+          }
+          <mat-card-header>
+            <mat-card-title>
+              <span class="issue-number">#{{ issue.issueNumber }}</span>
+              {{ issue.title }}
+            </mat-card-title>
+            <mat-card-subtitle>
+              @if (issue.published) {
+                <span class="published-badge">Published</span>
+              } @else {
+                <span class="draft-badge">Draft</span>
+              }
+              @if (issue.publishDate) {
+                &middot; {{ issue.publishDate }}
+              }
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions align="end">
+            <button mat-button (click)="editIssue(issue)">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+            <a mat-button [routerLink]="['/webcomics', s.id, 'issues', issue.id]">
+              <mat-icon>photo_library</mat-icon>
+              Pages
+            </a>
+            <button mat-icon-button color="warn" (click)="confirmDeleteIssue(issue)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+}

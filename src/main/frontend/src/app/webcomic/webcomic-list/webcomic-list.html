@@ -1,0 +1,68 @@
+<div class="header">
+  <div>
+    <h1>Webcomic Series</h1>
+    <p class="subtitle">Manage your webcomic series, issues, and pages.</p>
+  </div>
+  <button mat-fab extended (click)="createSeries()">
+    <mat-icon>add</mat-icon>
+    New Series
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading series...</span>
+  </div>
+} @else if (series().length === 0) {
+  <div class="empty-state">
+    <mat-icon>menu_book</mat-icon>
+    <h2>No series yet</h2>
+    <p>Create your first webcomic series to get started.</p>
+    <button mat-flat-button (click)="createSeries()">
+      <mat-icon>add</mat-icon>
+      Create Series
+    </button>
+  </div>
+} @else {
+  <div class="series-grid">
+    @for (s of series(); track s.id) {
+      <mat-card appearance="outlined" class="series-card">
+        @if (s.coverImageUrl) {
+          <img mat-card-image [src]="s.coverImageUrl" [alt]="s.title" />
+        } @else {
+          <div class="placeholder-image">
+            <mat-icon>menu_book</mat-icon>
+          </div>
+        }
+        <mat-card-header>
+          <mat-card-title>{{ s.title }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ s.slug }}
+            @if (!s.active) {
+              <span class="inactive-badge">Inactive</span>
+            }
+          </mat-card-subtitle>
+        </mat-card-header>
+        @if (s.description) {
+          <mat-card-content>
+            <p class="description">{{ s.description }}</p>
+          </mat-card-content>
+        }
+        <mat-card-actions align="end">
+          <button mat-button (click)="editSeries(s)">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <a mat-button [routerLink]="['/webcomics', s.id]">
+            <mat-icon>arrow_forward</mat-icon>
+            Issues
+          </a>
+          <button mat-icon-button color="warn" (click)="confirmDeleteSeries(s)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+}

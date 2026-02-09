@@ -1,57 +1,54 @@
-
 // Include theming for Angular Material with `mat.theme()`.
 @use '@angular/material' as mat;
+@use '@angular/cdk' as cdk;
 
-// Custom palette based on TaupHat branding colors
-// Navy blue from the characters
-$tauphat-navy: (
-  0: #000000,
-  10: #001a41,
-  20: #002d66,
-  25: #003878,
-  30: #00448b,
-  35: #00509f,
-  40: #005cb3,
-  50: #2c75d9,
-  60: #5590ff,
-  70: #80abff,
-  80: #abc6ff,
-  90: #d6e2ff,
-  95: #ebf0ff,
-  98: #f8f9ff,
-  99: #fcfcff,
-  100: #ffffff,
-);
-
-// Warm coral/peach from the background
-$tauphat-coral: (
-  0: #000000,
-  10: #3a1100,
-  20: #5d2300,
-  25: #6f2d00,
-  30: #813800,
-  35: #934300,
-  40: #a64f00,
-  50: #cd6900,
-  60: #f68400,
-  70: #ff9f48,
-  80: #ffb871,
-  90: #ffd9b8,
-  95: #ffede0,
-  98: #fff8f5,
-  99: #fffbff,
-  100: #ffffff,
-);
+@include cdk.overlay();
 
 html {
   @include mat.theme((
     color: (
-      primary: $tauphat-navy,
-      tertiary: $tauphat-coral,
+      primary: mat.$azure-palette,
+      tertiary: mat.$orange-palette,
+      theme-type: light,
     ),
     typography: Roboto,
     density: 0,
   ));
+}
+
+// Angular Material 21's light-dark() token generation produces empty values for
+// neutral-derived system tokens with the current build tooling. Override these
+// with concrete values from the Azure palette. Using html[style] trick won't work,
+// so we use a @layer or higher specificity.
+html.mat-theme-loaded,
+html {
+  --mat-sys-surface: #faf9fd !important;
+  --mat-sys-surface-dim: #dad9dd !important;
+  --mat-sys-surface-bright: #faf9fd !important;
+  --mat-sys-surface-container-lowest: #ffffff !important;
+  --mat-sys-surface-container-low: #f4f3f6 !important;
+  --mat-sys-surface-container: #efedf0 !important;
+  --mat-sys-surface-container-high: #e9e7eb !important;
+  --mat-sys-surface-container-highest: #e3e2e6 !important;
+  --mat-sys-surface-variant: #e0e2ec !important;
+  --mat-sys-on-surface: #1a1b1f !important;
+  --mat-sys-on-surface-variant: #44474e !important;
+  --mat-sys-outline: #74777f !important;
+  --mat-sys-outline-variant: #c4c6d0 !important;
+  --mat-sys-background: #faf9fd !important;
+  --mat-sys-on-background: #1a1b1f !important;
+  --mat-sys-inverse-surface: #2f3033 !important;
+  --mat-sys-inverse-on-surface: #f2f0f4 !important;
+  --mat-sys-scrim: #000000 !important;
+  --mat-sys-shadow: #000000 !important;
+  --mat-sys-error: #ba1a1a !important;
+  --mat-sys-error-container: #ffdad6 !important;
+  --mat-sys-on-error: #ffffff !important;
+  --mat-sys-on-error-container: #93000a !important;
+  --mat-sys-secondary: #565e71 !important;
+  --mat-sys-secondary-container: #dae2f9 !important;
+  --mat-sys-on-secondary: #ffffff !important;
+  --mat-sys-on-secondary-container: #3e4759 !important;
 }
 
 body {
@@ -65,4 +62,19 @@ body {
 html, body {
   height: 100%;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// ── Zoneless dialog fix ──────────────────────────────────────────────────────
+// With zoneless change detection, the Material Dialog animation states do not
+// reliably transition. Force the dialog to its visible/open state.
+.cdk-overlay-dark-backdrop {
+  background-color: rgba(0, 0, 0, 0.32);
+}
+
+.mat-mdc-dialog-inner-container {
+  opacity: 1 !important;
+}
+
+.mat-mdc-dialog-surface {
+  transform: none !important;
 }

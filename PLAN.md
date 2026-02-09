@@ -235,9 +235,9 @@ The Angular admin dashboard uses Material Design 3 with these areas:
 
 Database, auth, project structure, GCS integration.
 
-### Phase 2: Webcomic Management -- PENDING
+### Phase 2: Webcomic Management -- COMPLETED
 
-Series/Issue/Page CRUD with image upload.
+Series/Issue/Page CRUD with image upload, drag-and-drop page reordering, GCS asset lifecycle.
 
 ### Phase 3: Portfolio Management -- PENDING
 
@@ -397,3 +397,60 @@ cd src/main/frontend && npm start
 # Angular tests
 cd src/main/frontend && npm test
 ```
+
+---
+
+## Phase 2 Completed Work
+
+### Backend REST Controllers
+
+```
+src/main/java/org/tanzu/thstudio/webcomic/
+├── WebcomicSeriesController.java      # CRUD + reorder for series
+├── WebcomicIssueController.java       # CRUD for issues within a series
+└── WebcomicPageController.java        # Page upload, reorder, delete with GCS cleanup
+```
+
+- **Series**: `GET/POST/PUT/DELETE /api/webcomic/series`, `PUT /api/webcomic/series/reorder`
+- **Issues**: `GET/POST/PUT/DELETE /api/webcomic/series/{seriesId}/issues`
+- **Pages**: `GET/POST /api/webcomic/series/{seriesId}/issues/{issueId}/pages`, `PUT .../pages/reorder`, `DELETE .../pages/{pageId}`
+
+### Backend Fixes and Improvements
+
+- **`@JsonIgnore` on lazy collections**: Added to `WebcomicSeries.issues` and `WebcomicIssue.pages` to prevent `LazyInitializationException` during JSON serialization (no open session with `spring.jpa.open-in-view=false`)
+- **JPA query path resolution**: Renamed repository methods from `findBySeriesId` to `findBySeries_Id` (and `findByIssueId` to `findByIssue_Id`) for Hibernate 7.2.1 compatibility, which requires explicit underscore notation to navigate `@ManyToOne` relationships
+- **WebP support**: Added `com.twelvemonkeys.imageio:imageio-webp:3.13.0` dependency so Thumbnailator can read WebP images via Java ImageIO
+- **Resize output format**: Resized variants (optimized + thumbnail) are always output as PNG to avoid WebP write codec issues; originals are preserved in their native format
+- **GCS asset cleanup on delete**: `StorageService.deleteByPrefix()` removes all GCS objects under a path prefix; wired into series delete (`images/webcomic/{seriesId}/`), issue delete (`images/webcomic/{seriesId}/{issueId}/`), and page delete (individual files)
+- **Page reorder unique constraint**: Two-pass approach within `@Transactional` — first sets temporary negative page numbers, flushes, then assigns final order — to avoid violating the `(issue_id, page_number)` unique constraint
+- **`spring-boot-starter-flyway`**: Replaced direct `flyway-core` dependency with the starter for proper auto-configuration in Spring Boot 4.x
+
+### Frontend Components
+
+```
+src/main/frontend/src/app/
+├── webcomic/
+│   ├── webcomic.models.ts             # WebcomicSeries, WebcomicIssue, WebcomicPage interfaces
+│   ├── webcomic.service.ts            # HTTP client for all webcomic API endpoints
+│   ├── webcomic-list/                 # Series grid with create/edit/delete
+│   ├── series-detail/                 # Issue list within a series
+│   ├── issue-detail/                  # Page grid with upload, drag-and-drop reorder, delete
+│   ├── series-dialog/                 # Create/edit series dialog
+│   └── issue-dialog/                  # Create/edit issue dialog
+└── shared/
+    └── confirm-dialog/                # Reusable confirmation dialog
+```
+
+### Frontend Fixes and Improvements
+
+- **CDK drag-and-drop**: Uses `cdkDropListSortingDisabled` with flex-wrap layout for reliable reordering in wrapping grids; CDK's default `mixed` sort strategy has index calculation issues with CSS Grid and flex-wrap
+- **Dialog transparency fix**: Added CDK overlay styles, switched to `provideAnimationsAsync()`, and overrode neutral-derived `--mat-sys-*` CSS custom properties that `ng serve` generates as empty `light-dark(, )` values
+- **Dialog label clipping**: Added `padding-top: 24px` to `mat-dialog-content` to prevent outline form field floating labels from being clipped
+
+### Routes Added
+
+| Route | Component | Purpose |
+|-------|-----------|---------|
+| `/webcomics` | `WebcomicList` | Series management grid |
+| `/webcomics/:seriesId` | `SeriesDetail` | Issue management for a series |
+| `/webcomics/:seriesId/issues/:issueId` | `IssueDetail` | Page management with upload and reorder |

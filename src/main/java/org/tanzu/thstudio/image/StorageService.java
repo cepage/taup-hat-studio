@@ -1,5 +1,6 @@
 package org.tanzu.thstudio.image;
 
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
@@ -74,12 +75,29 @@ public class StorageService {
     }
 
     /**
-     * Deletes an object from GCS.
+     * Deletes a single object from GCS.
      */
     public void delete(String path) {
         String bucket = properties.gcs().bucketName();
         getStorage().delete(BlobId.of(bucket, path));
         log.info("Deleted gs://{}/{}", bucket, path);
+    }
+
+    /**
+     * Deletes all objects under the given prefix in GCS.
+     * Useful for cleaning up all assets belonging to an issue or series.
+     *
+     * @param prefix the object path prefix (e.g. "images/webcomic/1/2")
+     */
+    public void deleteByPrefix(String prefix) {
+        String bucket = properties.gcs().bucketName();
+        var blobs = getStorage().list(bucket, Storage.BlobListOption.prefix(prefix));
+        int count = 0;
+        for (Blob blob : blobs.iterateAll()) {
+            blob.delete();
+            count++;
+        }
+        log.info("Deleted {} objects under gs://{}/{}", count, bucket, prefix);
     }
 
     private String publicUrl(String bucket, String path) {

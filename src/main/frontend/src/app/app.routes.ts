@@ -16,6 +16,16 @@ export const routes: Routes = [
           import('./webcomic/webcomic-list/webcomic-list').then((m) => m.WebcomicList),
       },
       {
+        path: 'webcomics/:seriesId',
+        loadComponent: () =>
+          import('./webcomic/series-detail/series-detail').then((m) => m.SeriesDetail),
+      },
+      {
+        path: 'webcomics/:seriesId/issues/:issueId',
+        loadComponent: () =>
+          import('./webcomic/issue-detail/issue-detail').then((m) => m.IssueDetail),
+      },
+      {
         path: 'portfolio',
         loadComponent: () =>
           import('./portfolio/portfolio-list/portfolio-list').then((m) => m.PortfolioList),

@@ -1,0 +1,88 @@
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading...</span>
+  </div>
+} @else if (issue(); as iss) {
+  <div class="header">
+    <div class="header-left">
+      <a mat-icon-button [routerLink]="['/webcomics', seriesId]" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <div>
+        <p class="breadcrumb">{{ seriesTitle() }}</p>
+        <h1>
+          <span class="issue-number">#{{ iss.issueNumber }}</span>
+          {{ iss.title }}
+        </h1>
+        <p class="subtitle">
+          {{ pages().length }} page{{ pages().length !== 1 ? 's' : '' }}
+          @if (iss.published) {
+            <span class="published-badge">Published</span>
+          } @else {
+            <span class="draft-badge">Draft</span>
+          }
+        </p>
+      </div>
+    </div>
+    <div class="actions">
+      <button mat-button (click)="editIssue()">
+        <mat-icon>edit</mat-icon>
+        Edit Issue
+      </button>
+      <button mat-fab extended (click)="triggerFileUpload()">
+        <mat-icon>upload</mat-icon>
+        Upload Pages
+      </button>
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        multiple
+        hidden
+        (change)="onFilesSelected($event)"
+      />
+    </div>
+  </div>
+
+  @if (uploading()) {
+    <mat-progress-bar mode="determinate" [value]="uploadProgress()" />
+    <p class="upload-status">
+      Uploading {{ uploadCurrent() }} of {{ uploadTotal() }}...
+    </p>
+  }
+
+  @if (pages().length === 0 && !uploading()) {
+    <div class="empty-state">
+      <mat-icon>image</mat-icon>
+      <h2>No pages yet</h2>
+      <p>Upload images to add pages to this issue.</p>
+      <button mat-flat-button (click)="triggerFileUpload()">
+        <mat-icon>upload</mat-icon>
+        Upload Pages
+      </button>
+    </div>
+  } @else {
+    <div class="page-grid" cdkDropList [cdkDropListSortingDisabled]="true" (cdkDropListDropped)="onDrop($event)">
+      @for (page of pages(); track page.id) {
+        <div class="page-card" cdkDrag>
+          <div class="drag-handle" cdkDragHandle>
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+          <div class="page-image">
+            <img
+              [src]="page.thumbnailUrl || page.optimizedUrl || page.imageUrl"
+              [alt]="'Page ' + page.pageNumber"
+            />
+          </div>
+          <div class="page-info">
+            <span class="page-number">Page {{ page.pageNumber }}</span>
+            <button mat-icon-button color="warn" (click)="confirmDeletePage(page)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

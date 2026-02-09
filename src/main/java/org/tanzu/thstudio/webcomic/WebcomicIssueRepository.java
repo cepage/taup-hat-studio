@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface WebcomicIssueRepository extends JpaRepository<WebcomicIssue, Long> {
 
-    List<WebcomicIssue> findBySeriesIdOrderByIssueNumberDesc(Long seriesId);
+    List<WebcomicIssue> findBySeries_IdOrderByIssueNumberDesc(Long seriesId);
 
-    List<WebcomicIssue> findBySeriesIdAndPublishedTrueOrderByIssueNumberDesc(Long seriesId);
+    List<WebcomicIssue> findBySeries_IdAndPublishedTrueOrderByIssueNumberDesc(Long seriesId);
 
-    Optional<WebcomicIssue> findBySeriesIdAndIssueNumber(Long seriesId, Integer issueNumber);
+    Optional<WebcomicIssue> findBySeries_IdAndIssueNumber(Long seriesId, Integer issueNumber);
 
-    Optional<WebcomicIssue> findFirstBySeriesIdAndPublishedTrueOrderByIssueNumberDesc(Long seriesId);
+    Optional<WebcomicIssue> findFirstBySeries_IdAndPublishedTrueOrderByIssueNumberDesc(Long seriesId);
 }

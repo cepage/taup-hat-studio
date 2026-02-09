@@ -46,6 +46,7 @@ public class WebcomicIssue {
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("pageNumber ASC")
+    @JsonIgnore
     private List<WebcomicPage> pages = new ArrayList<>();
 
     // Transient field for JSON serialization

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface WebcomicPageRepository extends JpaRepository<WebcomicPage, Long> {
 
-    List<WebcomicPage> findByIssueIdOrderByPageNumberAsc(Long issueId);
+    List<WebcomicPage> findByIssue_IdOrderByPageNumberAsc(Long issueId);
 }
