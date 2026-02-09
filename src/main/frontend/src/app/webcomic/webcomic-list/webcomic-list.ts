@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -9,6 +10,7 @@ import { WebcomicSeries } from '../webcomic.models';
 import { WebcomicService } from '../webcomic.service';
 import { SeriesDialog } from '../series-dialog/series-dialog';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-webcomic-list',
@@ -16,8 +18,10 @@ import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
     RouterLink,
     MatButtonModule,
     MatCardModule,
+    MatChipsModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    EmptyStateComponent,
   ],
   templateUrl: './webcomic-list.html',
   styleUrl: './webcomic-list.scss',

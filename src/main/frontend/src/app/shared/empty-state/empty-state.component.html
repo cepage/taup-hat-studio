@@ -1,0 +1,8 @@
+<div class="empty-state" role="status" aria-live="polite">
+  <mat-icon>{{ icon() }}</mat-icon>
+  <h2>{{ title() }}</h2>
+  @if (description()) {
+    <p>{{ description() }}</p>
+  }
+  <ng-content select="[actions]" />
+</div>

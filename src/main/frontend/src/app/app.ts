@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -23,8 +24,12 @@ import { AuthService } from './auth/auth.service';
   styleUrl: './app.scss',
 })
 export class App {
+  private readonly breakpointObserver = inject(BreakpointObserver);
   protected readonly auth = inject(AuthService);
   protected readonly title = signal('TaupHat Studio');
+
+  protected readonly isMobile = signal(false);
+  protected readonly sidenavOpened = signal(true);
 
   protected readonly navItems = signal([
     { label: 'Dashboard', icon: 'dashboard', route: '/' },
@@ -33,4 +38,17 @@ export class App {
     { label: 'Theme', icon: 'palette', route: '/theme' },
     { label: 'Publish', icon: 'publish', route: '/publish' },
   ]);
+
+  constructor() {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset, Breakpoints.Tablet])
+      .subscribe(result => {
+        this.isMobile.set(result.matches);
+        this.sidenavOpened.set(!result.matches);
+      });
+  }
+
+  protected toggleSidenav(): void {
+    this.sidenavOpened.set(!this.sidenavOpened());
+  }
 }

@@ -15,15 +15,12 @@
     <span>Loading series...</span>
   </div>
 } @else if (series().length === 0) {
-  <div class="empty-state">
-    <mat-icon>menu_book</mat-icon>
-    <h2>No series yet</h2>
-    <p>Create your first webcomic series to get started.</p>
-    <button mat-flat-button (click)="createSeries()">
+  <app-empty-state icon="menu_book" title="No series yet" description="Create your first webcomic series to get started.">
+    <button mat-flat-button (click)="createSeries()" actions>
       <mat-icon>add</mat-icon>
       Create Series
     </button>
-  </div>
+  </app-empty-state>
 } @else {
   <div class="series-grid">
     @for (s of series(); track s.id) {
@@ -40,7 +37,9 @@
           <mat-card-subtitle>
             {{ s.slug }}
             @if (!s.active) {
-              <span class="inactive-badge">Inactive</span>
+              <mat-chip-set aria-label="Series status">
+                <mat-chip color="warn" highlighted>Inactive</mat-chip>
+              </mat-chip-set>
             }
           </mat-card-subtitle>
         </mat-card-header>
@@ -58,7 +57,7 @@
             <mat-icon>arrow_forward</mat-icon>
             Issues
           </a>
-          <button mat-icon-button color="warn" (click)="confirmDeleteSeries(s)">
+          <button mat-icon-button color="warn" (click)="confirmDeleteSeries(s)" aria-label="Delete series">
             <mat-icon>delete</mat-icon>
           </button>
         </mat-card-actions>

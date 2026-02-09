@@ -6,7 +6,7 @@
 } @else if (issue(); as iss) {
   <div class="header">
     <div class="header-left">
-      <a mat-icon-button [routerLink]="['/webcomics', seriesId]" class="back-button">
+      <a mat-icon-button [routerLink]="['/webcomics', seriesId]" class="back-button" aria-label="Back to issue list">
         <mat-icon>arrow_back</mat-icon>
       </a>
       <div>
@@ -17,11 +17,13 @@
         </h1>
         <p class="subtitle">
           {{ pages().length }} page{{ pages().length !== 1 ? 's' : '' }}
-          @if (iss.published) {
-            <span class="published-badge">Published</span>
-          } @else {
-            <span class="draft-badge">Draft</span>
-          }
+          <mat-chip-set aria-label="Issue status">
+            @if (iss.published) {
+              <mat-chip color="tertiary" highlighted>Published</mat-chip>
+            } @else {
+              <mat-chip>Draft</mat-chip>
+            }
+          </mat-chip-set>
         </p>
       </div>
     </div>
@@ -53,15 +55,12 @@
   }
 
   @if (pages().length === 0 && !uploading()) {
-    <div class="empty-state">
-      <mat-icon>image</mat-icon>
-      <h2>No pages yet</h2>
-      <p>Upload images to add pages to this issue.</p>
-      <button mat-flat-button (click)="triggerFileUpload()">
+    <app-empty-state icon="image" title="No pages yet" description="Upload images to add pages to this issue.">
+      <button mat-flat-button (click)="triggerFileUpload()" actions>
         <mat-icon>upload</mat-icon>
         Upload Pages
       </button>
-    </div>
+    </app-empty-state>
   } @else {
     <div class="page-grid">
       @for (page of pages(); track page.id) {
@@ -76,16 +75,16 @@
             <span class="page-number">Page {{ page.pageNumber }}</span>
             <div class="page-actions">
               @if (!$first) {
-                <button mat-icon-button (click)="movePage($index, -1)">
+                <button mat-icon-button (click)="movePage($index, -1)" aria-label="Move page left">
                   <mat-icon>chevron_left</mat-icon>
                 </button>
               }
               @if (!$last) {
-                <button mat-icon-button (click)="movePage($index, 1)">
+                <button mat-icon-button (click)="movePage($index, 1)" aria-label="Move page right">
                   <mat-icon>chevron_right</mat-icon>
                 </button>
               }
-              <button mat-icon-button color="warn" (click)="confirmDeletePage(page)">
+              <button mat-icon-button color="warn" (click)="confirmDeletePage(page)" aria-label="Delete page">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>

@@ -6,7 +6,7 @@
 } @else if (series(); as s) {
   <div class="header">
     <div class="header-left">
-      <a mat-icon-button routerLink="/webcomics" class="back-button">
+      <a mat-icon-button routerLink="/webcomics" class="back-button" aria-label="Back to series list">
         <mat-icon>arrow_back</mat-icon>
       </a>
       <div>
@@ -14,7 +14,9 @@
         <p class="subtitle">
           {{ issues().length }} issue{{ issues().length !== 1 ? 's' : '' }}
           @if (!s.active) {
-            <span class="inactive-badge">Inactive</span>
+            <mat-chip-set aria-label="Series status">
+              <mat-chip color="warn" highlighted>Inactive</mat-chip>
+            </mat-chip-set>
           }
         </p>
       </div>
@@ -32,15 +34,12 @@
   </div>
 
   @if (issues().length === 0) {
-    <div class="empty-state">
-      <mat-icon>auto_stories</mat-icon>
-      <h2>No issues yet</h2>
-      <p>Create the first issue for this series.</p>
-      <button mat-flat-button (click)="createIssue()">
+    <app-empty-state icon="auto_stories" title="No issues yet" description="Create the first issue for this series.">
+      <button mat-flat-button (click)="createIssue()" actions>
         <mat-icon>add</mat-icon>
         Create Issue
       </button>
-    </div>
+    </app-empty-state>
   } @else {
     <div class="issue-grid">
       @for (issue of issues(); track issue.id) {
@@ -58,11 +57,13 @@
               {{ issue.title }}
             </mat-card-title>
             <mat-card-subtitle>
-              @if (issue.published) {
-                <span class="published-badge">Published</span>
-              } @else {
-                <span class="draft-badge">Draft</span>
-              }
+              <mat-chip-set aria-label="Issue status">
+                @if (issue.published) {
+                  <mat-chip color="tertiary" highlighted>Published</mat-chip>
+                } @else {
+                  <mat-chip>Draft</mat-chip>
+                }
+              </mat-chip-set>
               @if (issue.publishDate) {
                 &middot; {{ issue.publishDate }}
               }
@@ -77,7 +78,7 @@
               <mat-icon>photo_library</mat-icon>
               Pages
             </a>
-            <button mat-icon-button color="warn" (click)="confirmDeleteIssue(issue)">
+            <button mat-icon-button color="warn" (click)="confirmDeleteIssue(issue)" aria-label="Delete issue">
               <mat-icon>delete</mat-icon>
             </button>
           </mat-card-actions>

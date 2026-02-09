@@ -1,6 +1,7 @@
 import { Component, ElementRef, inject, signal, OnInit, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -9,15 +10,18 @@ import { WebcomicIssue, WebcomicPage } from '../webcomic.models';
 import { WebcomicService } from '../webcomic.service';
 import { IssueDialog } from '../issue-dialog/issue-dialog';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-issue-detail',
   imports: [
     RouterLink,
     MatButtonModule,
+    MatChipsModule,
     MatIconModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    EmptyStateComponent,
   ],
   templateUrl: './issue-detail.html',
   styleUrl: './issue-detail.scss',
