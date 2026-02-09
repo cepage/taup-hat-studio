@@ -12,6 +12,7 @@ export interface PreviewResponse {
 
 export interface DeployResponse {
   status: string;
+  siteUrl?: string;
   fileCount?: number;
   timestamp: string;
   message?: string;

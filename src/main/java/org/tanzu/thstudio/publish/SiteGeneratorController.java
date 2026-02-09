@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.tanzu.thstudio.config.TaupHatProperties;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,11 +27,14 @@ public class SiteGeneratorController {
 
     private final SiteGeneratorService generatorService;
     private final FirebaseHostingService firebaseHostingService;
+    private final TaupHatProperties properties;
 
     public SiteGeneratorController(SiteGeneratorService generatorService,
-                                   FirebaseHostingService firebaseHostingService) {
+                                   FirebaseHostingService firebaseHostingService,
+                                   TaupHatProperties properties) {
         this.generatorService = generatorService;
         this.firebaseHostingService = firebaseHostingService;
+        this.properties = properties;
     }
 
     /**
@@ -68,8 +72,10 @@ public class SiteGeneratorController {
         try {
             var site = generatorService.generate();
             firebaseHostingService.deployToLive(site);
+            String siteUrl = "https://" + properties.firebase().siteId() + ".web.app";
             return ResponseEntity.ok(Map.of(
                     "status", "success",
+                    "siteUrl", siteUrl,
                     "fileCount", site.fileCount(),
                     "timestamp", LocalDateTime.now().toString()
             ));

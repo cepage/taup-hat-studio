@@ -33,7 +33,7 @@ export class Publish {
   readonly deploying = signal(false);
   readonly previewUrl = signal<string | null>(null);
   readonly lastPreview = signal<{ fileCount: number; timestamp: string } | null>(null);
-  readonly lastDeploy = signal<{ fileCount: number; timestamp: string } | null>(null);
+  readonly lastDeploy = signal<{ fileCount: number; timestamp: string; siteUrl: string | null } | null>(null);
   readonly error = signal<string | null>(null);
 
   generatePreview(): void {
@@ -89,6 +89,7 @@ export class Publish {
             this.lastDeploy.set({
               fileCount: response.fileCount ?? 0,
               timestamp: response.timestamp,
+              siteUrl: response.siteUrl ?? null,
             });
             this.snackBar.open('Site deployed to production successfully!', 'Dismiss', {
               duration: 5000,

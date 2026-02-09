@@ -74,10 +74,16 @@
       }
 
       @if (lastDeploy(); as deploy) {
+        @if (deploy.siteUrl) {
+          <div class="preview-link">
+            <mat-icon>open_in_new</mat-icon>
+            <a [href]="deploy.siteUrl" target="_blank" rel="noopener noreferrer">{{ deploy.siteUrl }}</a>
+          </div>
+        }
         <div class="status-detail success">
           <mat-icon>check_circle</mat-icon>
           <span>
-            Last deployed {{ deploy.fileCount }} files at {{ deploy.timestamp }}
+            Deployed {{ deploy.fileCount }} files at {{ deploy.timestamp }}
           </span>
         </div>
       }
