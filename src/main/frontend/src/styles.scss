@@ -2,11 +2,52 @@
 // Include theming for Angular Material with `mat.theme()`.
 @use '@angular/material' as mat;
 
+// Custom palette based on TaupHat branding colors
+// Navy blue from the characters
+$tauphat-navy: (
+  0: #000000,
+  10: #001a41,
+  20: #002d66,
+  25: #003878,
+  30: #00448b,
+  35: #00509f,
+  40: #005cb3,
+  50: #2c75d9,
+  60: #5590ff,
+  70: #80abff,
+  80: #abc6ff,
+  90: #d6e2ff,
+  95: #ebf0ff,
+  98: #f8f9ff,
+  99: #fcfcff,
+  100: #ffffff,
+);
+
+// Warm coral/peach from the background
+$tauphat-coral: (
+  0: #000000,
+  10: #3a1100,
+  20: #5d2300,
+  25: #6f2d00,
+  30: #813800,
+  35: #934300,
+  40: #a64f00,
+  50: #cd6900,
+  60: #f68400,
+  70: #ff9f48,
+  80: #ffb871,
+  90: #ffd9b8,
+  95: #ffede0,
+  98: #fff8f5,
+  99: #fffbff,
+  100: #ffffff,
+);
+
 html {
   @include mat.theme((
     color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      primary: $tauphat-navy,
+      tertiary: $tauphat-coral,
     ),
     typography: Roboto,
     density: 0,
