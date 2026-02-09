@@ -1,6 +1,5 @@
 import { Component, ElementRef, inject, signal, OnInit, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CdkDragDrop, CdkDropList, CdkDrag, CdkDragHandle, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,9 +14,6 @@ import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
   selector: 'app-issue-detail',
   imports: [
     RouterLink,
-    CdkDropList,
-    CdkDrag,
-    CdkDragHandle,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
@@ -131,17 +127,18 @@ export class IssueDetail implements OnInit {
     });
   }
 
-  protected onDrop(event: CdkDragDrop<WebcomicPage[]>): void {
-    if (event.previousIndex === event.currentIndex) return;
-
+  protected movePage(index: number, direction: -1 | 1): void {
+    const targetIndex = index + direction;
     const currentPages = [...this.pages()];
-    moveItemInArray(currentPages, event.previousIndex, event.currentIndex);
+    if (targetIndex < 0 || targetIndex >= currentPages.length) return;
+
+    [currentPages[index], currentPages[targetIndex]] = [currentPages[targetIndex], currentPages[index]];
     this.pages.set(currentPages);
 
     const orderedIds = currentPages.map((p) => p.id!);
     this.webcomicService.reorderPages(this.seriesId, this.issueId, orderedIds).subscribe({
       next: (reordered) => this.pages.set(reordered),
-      error: () => this.loadPages(), // Revert on error
+      error: () => this.loadPages(),
     });
   }
 

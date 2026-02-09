@@ -63,12 +63,9 @@
       </button>
     </div>
   } @else {
-    <div class="page-grid" cdkDropList [cdkDropListSortingDisabled]="true" (cdkDropListDropped)="onDrop($event)">
+    <div class="page-grid">
       @for (page of pages(); track page.id) {
-        <div class="page-card" cdkDrag>
-          <div class="drag-handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
+        <div class="page-card">
           <div class="page-image">
             <img
               [src]="page.thumbnailUrl || page.optimizedUrl || page.imageUrl"
@@ -77,9 +74,21 @@
           </div>
           <div class="page-info">
             <span class="page-number">Page {{ page.pageNumber }}</span>
-            <button mat-icon-button color="warn" (click)="confirmDeletePage(page)">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="page-actions">
+              @if (!$first) {
+                <button mat-icon-button (click)="movePage($index, -1)">
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+              }
+              @if (!$last) {
+                <button mat-icon-button (click)="movePage($index, 1)">
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+              }
+              <button mat-icon-button color="warn" (click)="confirmDeletePage(page)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
       }

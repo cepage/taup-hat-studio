@@ -127,38 +127,10 @@
   border-radius: 12px;
   overflow: hidden;
   background: var(--mat-sys-surface);
-  cursor: grab;
   transition: box-shadow 0.2s;
 
   &:hover {
     box-shadow: var(--mat-sys-level2);
-  }
-
-  &.cdk-drag-preview {
-    box-shadow: var(--mat-sys-level4);
-  }
-
-  &.cdk-drag-placeholder {
-    background: var(--mat-sys-primary-container);
-    opacity: 0.4;
-    border: 2px dashed var(--mat-sys-primary);
-
-    * {
-      visibility: hidden;
-    }
-  }
-}
-
-.drag-handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  cursor: grab;
-  color: var(--mat-sys-on-surface-variant);
-
-  &:active {
-    cursor: grabbing;
   }
 }
 
@@ -180,10 +152,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 4px 4px 4px 12px;
 
   .page-number {
     font: var(--mat-sys-label-large);
     color: var(--mat-sys-on-surface);
   }
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
 }
