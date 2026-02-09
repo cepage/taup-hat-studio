@@ -1,0 +1,272 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  padding-bottom: 80px; // space for floating save bar
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  h1 {
+    font: var(--mat-sys-headline-medium);
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    font: var(--mat-sys-body-large);
+    color: var(--mat-sys-on-surface-variant);
+    margin: 0;
+  }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  padding: 48px 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.upload-status {
+  text-align: center;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  margin: 8px 0 16px;
+}
+
+// ── Layout ──────────────────────────────────────────────────────────────────
+
+.editor-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+}
+
+mat-card {
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px !important;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  [mat-card-avatar] {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+// ── Color Palette ───────────────────────────────────────────────────────────
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.color-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-label {
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.color-hint {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.color-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-picker {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+  background: none;
+  flex-shrink: 0;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+  }
+}
+
+.color-hex {
+  flex: 1;
+}
+
+.color-preview {
+  margin-top: 8px;
+}
+
+.preview-label {
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.preview-bar {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  @include mat.elevation(1);
+}
+
+.preview-swatch {
+  flex: 1;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+
+  span {
+    font: var(--mat-sys-label-medium);
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+}
+
+// ── Typography ──────────────────────────────────────────────────────────────
+
+.font-preview {
+  margin-top: 8px;
+}
+
+.font-preview-box {
+  padding: 20px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-lowest);
+}
+
+.heading-preview {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--mat-sys-on-surface);
+}
+
+.body-preview {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// ── Hero Image ──────────────────────────────────────────────────────────────
+
+.hero-preview {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant);
+
+  img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.hero-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 48px 24px;
+  border: 2px dashed var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
+  &:hover {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-surface-container-low);
+  }
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  span {
+    font: var(--mat-sys-body-large);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .dropzone-hint {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-outline);
+  }
+}
+
+// ── Social Links ────────────────────────────────────────────────────────────
+
+.social-link-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-field {
+  flex: 0 0 180px;
+}
+
+.url-field {
+  flex: 1;
+}
+
+// ── Floating Save Bar ───────────────────────────────────────────────────────
+
+.save-bar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+}

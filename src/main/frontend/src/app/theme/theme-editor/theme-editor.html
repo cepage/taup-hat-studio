@@ -1,0 +1,279 @@
+<div class="header">
+  <div>
+    <h1>Site Theme</h1>
+    <p class="subtitle">Customize colors, fonts, and content for your published site.</p>
+  </div>
+  <button mat-fab extended [disabled]="saving()" (click)="saveConfig()">
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</div>
+
+@if (saving()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading theme settings...</span>
+  </div>
+} @else if (config(); as cfg) {
+  <div class="editor-layout">
+    <!-- Site Identity -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>badge</mat-icon>
+        <mat-card-title>Site Identity</mat-card-title>
+        <mat-card-subtitle>Basic site information</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline">
+          <mat-label>Site Name</mat-label>
+          <input matInput [(ngModel)]="cfg.siteName" />
+          <mat-hint>Displayed in the browser tab and site header</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>BigCartel Store URL</mat-label>
+          <input matInput [(ngModel)]="cfg.bigcartelUrl" placeholder="https://yourstore.bigcartel.com" />
+          <mat-icon matPrefix>store</mat-icon>
+          <mat-hint>Link to your BigCartel shop</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Color Palette -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>palette</mat-icon>
+        <mat-card-title>Color Palette</mat-card-title>
+        <mat-card-subtitle>Choose colors for your published site</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="color-grid">
+          <div class="color-field">
+            <label class="color-label">Primary Color</label>
+            <div class="color-input-row">
+              <input
+                type="color"
+                [ngModel]="cfg.primaryColor"
+                (ngModelChange)="cfg.primaryColor = $event"
+                class="color-picker"
+              />
+              <mat-form-field appearance="outline" class="color-hex">
+                <mat-label>Hex</mat-label>
+                <input matInput [(ngModel)]="cfg.primaryColor" maxlength="7" />
+              </mat-form-field>
+            </div>
+            <span class="color-hint">Main brand color for headings and links</span>
+          </div>
+
+          <div class="color-field">
+            <label class="color-label">Secondary Color</label>
+            <div class="color-input-row">
+              <input
+                type="color"
+                [ngModel]="cfg.secondaryColor"
+                (ngModelChange)="cfg.secondaryColor = $event"
+                class="color-picker"
+              />
+              <mat-form-field appearance="outline" class="color-hex">
+                <mat-label>Hex</mat-label>
+                <input matInput [(ngModel)]="cfg.secondaryColor" maxlength="7" />
+              </mat-form-field>
+            </div>
+            <span class="color-hint">Backgrounds, accents, and secondary elements</span>
+          </div>
+
+          <div class="color-field">
+            <label class="color-label">Accent Color</label>
+            <div class="color-input-row">
+              <input
+                type="color"
+                [ngModel]="cfg.accentColor"
+                (ngModelChange)="cfg.accentColor = $event"
+                class="color-picker"
+              />
+              <mat-form-field appearance="outline" class="color-hex">
+                <mat-label>Hex</mat-label>
+                <input matInput [(ngModel)]="cfg.accentColor" maxlength="7" />
+              </mat-form-field>
+            </div>
+            <span class="color-hint">Buttons, highlights, and call-to-action elements</span>
+          </div>
+        </div>
+
+        <!-- Color Preview -->
+        <div class="color-preview">
+          <span class="preview-label">Preview</span>
+          <div class="preview-bar">
+            <div class="preview-swatch" [style.background-color]="cfg.primaryColor">
+              <span>Primary</span>
+            </div>
+            <div class="preview-swatch" [style.background-color]="cfg.secondaryColor">
+              <span>Secondary</span>
+            </div>
+            <div class="preview-swatch" [style.background-color]="cfg.accentColor">
+              <span>Accent</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Typography -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>text_fields</mat-icon>
+        <mat-card-title>Typography</mat-card-title>
+        <mat-card-subtitle>Select Google Fonts for your site</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline">
+          <mat-label>Heading Font</mat-label>
+          <mat-select [(ngModel)]="cfg.headingFont">
+            @for (font of headingFonts; track font) {
+              <mat-option [value]="font">{{ font }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Used for page titles, section headings, and the site name</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Body Font</mat-label>
+          <mat-select [(ngModel)]="cfg.bodyFont">
+            @for (font of bodyFonts; track font) {
+              <mat-option [value]="font">{{ font }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Used for paragraphs, descriptions, and general text</mat-hint>
+        </mat-form-field>
+
+        <div class="font-preview">
+          <span class="preview-label">Preview</span>
+          <div class="font-preview-box">
+            <h3 class="heading-preview" [style.font-family]="cfg.headingFont + ', serif'">
+              {{ cfg.headingFont }} — The Quick Brown Fox
+            </h3>
+            <p class="body-preview" [style.font-family]="cfg.bodyFont + ', sans-serif'">
+              {{ cfg.bodyFont }} — The quick brown fox jumps over the lazy dog. Pack my box with five
+              dozen liquor jugs.
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Hero Image -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>image</mat-icon>
+        <mat-card-title>Hero Image</mat-card-title>
+        <mat-card-subtitle>Banner image displayed on the home page</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (uploadingHero()) {
+          <mat-progress-bar mode="indeterminate" />
+          <p class="upload-status">Uploading hero image...</p>
+        }
+
+        @if (cfg.heroImageUrl) {
+          <div class="hero-preview">
+            <img [src]="cfg.heroImageUrl" alt="Hero image preview" />
+            <div class="hero-actions">
+              <button mat-stroked-button (click)="heroInput.click()">
+                <mat-icon>photo_camera</mat-icon>
+                Replace Image
+              </button>
+              <button mat-stroked-button color="warn" (click)="removeHeroImage()">
+                <mat-icon>delete</mat-icon>
+                Remove
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="hero-dropzone" (click)="heroInput.click()">
+            <mat-icon>add_photo_alternate</mat-icon>
+            <span>Click to upload a hero image</span>
+            <span class="dropzone-hint">Recommended: 1920×600 or wider</span>
+          </div>
+        }
+
+        <input
+          #heroInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="onHeroImageSelected($event)"
+        />
+      </mat-card-content>
+    </mat-card>
+
+    <!-- About Section -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>person</mat-icon>
+        <mat-card-title>About Page</mat-card-title>
+        <mat-card-subtitle>Bio and information for the about page</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline">
+          <mat-label>About Text</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="cfg.aboutText"
+            rows="8"
+            placeholder="Write about yourself, your art, and your inspirations..."
+          ></textarea>
+          <mat-hint>Displayed on the About page of your site</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Social Links -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>share</mat-icon>
+        <mat-card-title>Social Links</mat-card-title>
+        <mat-card-subtitle>Links to your social media profiles</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @for (link of socialLinks(); track $index) {
+          <div class="social-link-row">
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>Platform</mat-label>
+              <mat-select [(ngModel)]="link.platform">
+                @for (platform of socialPlatforms; track platform) {
+                  <mat-option [value]="platform">{{ platform }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="url-field">
+              <mat-label>URL</mat-label>
+              <input matInput [(ngModel)]="link.url" placeholder="https://..." />
+            </mat-form-field>
+
+            <button mat-icon-button color="warn" (click)="removeSocialLink($index)" aria-label="Remove link">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+
+        <button mat-stroked-button (click)="addSocialLink()">
+          <mat-icon>add</mat-icon>
+          Add Social Link
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Floating save bar for long pages -->
+  <div class="save-bar">
+    <button mat-fab extended [disabled]="saving()" (click)="saveConfig()">
+      <mat-icon>save</mat-icon>
+      Save Changes
+    </button>
+  </div>
+}
