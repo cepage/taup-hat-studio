@@ -31,10 +31,17 @@ public class SiteConfigService {
         existing.setAccentColor(updated.getAccentColor());
         existing.setHeadingFont(updated.getHeadingFont());
         existing.setBodyFont(updated.getBodyFont());
-        existing.setHeroImageUrl(updated.getHeroImageUrl());
         existing.setAboutText(updated.getAboutText());
         existing.setBigcartelUrl(updated.getBigcartelUrl());
         existing.setSocialLinks(updated.getSocialLinks());
+        // Note: heroImageUrl is managed separately via the hero-image endpoint
         return repository.save(existing);
+    }
+
+    /**
+     * Saves the site config entity directly (used by hero image upload).
+     */
+    public SiteConfig save(SiteConfig config) {
+        return repository.save(config);
     }
 }

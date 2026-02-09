@@ -243,7 +243,7 @@ Series/Issue/Page CRUD with image upload, drag-and-drop page reordering, GCS ass
 
 Portfolio CRUD with image upload, image replacement, reorder, GCS asset lifecycle.
 
-### Phase 4: Site Theming -- PENDING
+### Phase 4: Site Theming -- COMPLETED
 
 Color/font/image customization.
 
@@ -504,3 +504,63 @@ src/main/frontend/src/app/portfolio/
 - **Upload progress**: Indeterminate progress bar during image processing
 - **Signals + zoneless**: All state managed via Angular signals with `provideZonelessChangeDetection()`
 - **Modern Angular**: Standalone component, `@if`/`@for` control flow, `viewChild()` signal query
+
+---
+
+## Phase 4 Completed Work
+
+### Backend Changes
+
+**`SiteConfigController.java`** -- Extended with hero image endpoints:
+
+- **Upload hero image**: `PUT /api/site-config/hero-image` (multipart) -- processes image via `ImageProcessingService`, stores the optimized variant URL, deletes any previous hero image from GCS
+- **Delete hero image**: `DELETE /api/site-config/hero-image` -- removes the hero image from GCS and clears the URL
+- **Config update safety**: `heroImageUrl` is no longer overwritten by `PUT /api/site-config`; it is managed exclusively via the hero-image endpoints
+
+**`SiteConfigService.java`** -- Added `save(SiteConfig)` method for direct entity persistence (used by the hero image endpoints).
+
+Images are stored in GCS under `images/site/` using the existing `ImageProcessingService` pipeline (original, optimized, thumbnail). The hero image URL points to the optimized (1200px) variant.
+
+### Frontend Components
+
+```
+src/main/frontend/src/app/theme/
+├── site-config.models.ts             # SiteConfig, SocialLink interfaces + font/platform constants
+├── site-config.service.ts            # HTTP client: get, update, uploadHeroImage, deleteHeroImage
+└── theme-editor/
+    ├── theme-editor.ts               # Main component: signal-based state, social links JSON parse/serialize
+    ├── theme-editor.html             # Six-section card layout with live previews
+    └── theme-editor.scss             # Material Design 3 styled editor with floating save FAB
+```
+
+### API Endpoints
+
+| Method | URL | Purpose |
+|--------|-----|---------|
+| `GET` | `/api/site-config` | Returns the singleton site config (Phase 1) |
+| `PUT` | `/api/site-config` | Updates all config fields except heroImageUrl (Phase 1, updated) |
+| `PUT` | `/api/site-config/hero-image` | Uploads/replaces the hero image |
+| `DELETE` | `/api/site-config/hero-image` | Removes the hero image |
+
+### Theme Editor Sections
+
+The editor is organized into six Material Design 3 outlined cards:
+
+1. **Site Identity** -- Site name and BigCartel store URL
+2. **Color Palette** -- Three native color pickers with synchronized hex text inputs and a live color preview bar (primary, secondary, accent)
+3. **Typography** -- Dropdown selectors for heading and body Google Fonts with a live font preview box (15 curated heading fonts, 15 body fonts)
+4. **Hero Image** -- Upload dropzone with dashed border, image preview with replace/remove buttons, progress indicator during upload
+5. **About Page** -- Multi-line textarea for the about page bio content
+6. **Social Links** -- Dynamic list of platform selector (13 platforms) and URL input rows with add/remove; serialized as JSON in the `socialLinks` database column
+
+### Key Features
+
+- **Signal-based state**: `config`, `loading`, `saving`, `uploadingHero`, `socialLinks` signals
+- **Live color preview**: Color swatch bar updates in real-time as colors are changed
+- **Live font preview**: Heading and body text samples render with the selected Google Font family
+- **Social links JSON**: Parsed from `socialLinks` column on load, serialized back on save; empty/incomplete entries are filtered out
+- **Snackbar notifications**: Success and error feedback via `MatSnackBar` for save and upload actions
+- **Hero image lifecycle**: Upload processes through `ImageProcessingService` (original, optimized, thumbnail); delete cleans up all GCS assets under `images/site/`
+- **Confirmation dialog**: Reuses existing `ConfirmDialog` before hero image removal
+- **Floating save FAB**: Fixed-position save button in the bottom-right corner for long pages
+- **Modern Angular**: Standalone component, `@if`/`@for` control flow, `FormsModule` with `ngModel` two-way binding, zoneless change detection
