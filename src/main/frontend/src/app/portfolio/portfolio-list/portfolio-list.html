@@ -1,0 +1,98 @@
+<div class="header">
+  <div>
+    <h1>Portfolio</h1>
+    <p class="subtitle">Manage your artwork portfolio.</p>
+  </div>
+  <button mat-fab extended (click)="createItem()">
+    <mat-icon>add</mat-icon>
+    New Item
+  </button>
+</div>
+
+<input
+  #imageInput
+  type="file"
+  accept="image/*"
+  hidden
+  (change)="onImageSelected($event)"
+/>
+
+@if (uploading()) {
+  <mat-progress-bar mode="indeterminate" />
+  <p class="upload-status">Processing image...</p>
+}
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading portfolio...</span>
+  </div>
+} @else if (items().length === 0) {
+  <app-empty-state icon="palette" title="No portfolio items yet" description="Add artwork to your portfolio to get started.">
+    <button mat-flat-button (click)="createItem()" actions>
+      <mat-icon>add</mat-icon>
+      Add Artwork
+    </button>
+  </app-empty-state>
+} @else {
+  <div class="portfolio-grid">
+    @for (item of items(); track item.id) {
+      <div class="portfolio-card">
+        <div class="card-image">
+          @if (item.thumbnailUrl || item.optimizedUrl || item.imageUrl) {
+            <img
+              [src]="item.thumbnailUrl || item.optimizedUrl || item.imageUrl"
+              [alt]="item.title"
+            />
+          } @else {
+            <div class="placeholder-image">
+              <mat-icon>image</mat-icon>
+            </div>
+          }
+          <div class="image-overlay">
+            <button
+              mat-icon-button
+              (click)="triggerReplaceImage(item)"
+              aria-label="Replace image"
+            >
+              <mat-icon>photo_camera</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <h3 class="item-title">{{ item.title }}</h3>
+          @if (item.category) {
+            <mat-chip-set aria-label="Category">
+              <mat-chip>{{ item.category }}</mat-chip>
+            </mat-chip-set>
+          }
+          @if (item.description) {
+            <p class="item-description">{{ item.description }}</p>
+          }
+        </div>
+        <div class="card-actions">
+          <div class="reorder-actions">
+            @if (!$first) {
+              <button mat-icon-button (click)="moveItem($index, -1)" aria-label="Move item left">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+            }
+            @if (!$last) {
+              <button mat-icon-button (click)="moveItem($index, 1)" aria-label="Move item right">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+            }
+          </div>
+          <div class="item-actions">
+            <button mat-icon-button (click)="editItem(item)" aria-label="Edit item">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="confirmDeleteItem(item)" aria-label="Delete item">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

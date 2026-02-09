@@ -239,9 +239,9 @@ Database, auth, project structure, GCS integration.
 
 Series/Issue/Page CRUD with image upload, drag-and-drop page reordering, GCS asset lifecycle.
 
-### Phase 3: Portfolio Management -- PENDING
+### Phase 3: Portfolio Management -- COMPLETED
 
-Portfolio CRUD with image upload.
+Portfolio CRUD with image upload, image replacement, reorder, GCS asset lifecycle.
 
 ### Phase 4: Site Theming -- PENDING
 
@@ -454,3 +454,53 @@ src/main/frontend/src/app/
 | `/webcomics` | `WebcomicList` | Series management grid |
 | `/webcomics/:seriesId` | `SeriesDetail` | Issue management for a series |
 | `/webcomics/:seriesId/issues/:issueId` | `IssueDetail` | Page management with upload and reorder |
+
+---
+
+## Phase 3 Completed Work
+
+### Backend REST Controller
+
+```
+src/main/java/org/tanzu/thstudio/portfolio/
+├── PortfolioItem.java                 # JPA entity (Phase 1)
+├── PortfolioItemRepository.java        # Spring Data JPA repository (Phase 1)
+└── PortfolioItemController.java       # Full CRUD + image upload/replace + reorder + GCS cleanup
+```
+
+- **List**: `GET /api/portfolio` -- returns all items ordered by `sortOrder`
+- **Get**: `GET /api/portfolio/{id}` -- returns a single item
+- **Create**: `POST /api/portfolio` (multipart) -- uploads image, creates item with title/description/category
+- **Update**: `PUT /api/portfolio/{id}` -- updates metadata (title, description, category) without re-uploading
+- **Replace image**: `PUT /api/portfolio/{id}/image` (multipart) -- deletes old GCS assets, uploads new image
+- **Delete**: `DELETE /api/portfolio/{id}` -- deletes item and all GCS assets (original, optimized, thumbnail)
+- **Reorder**: `PUT /api/portfolio/reorder` -- accepts ordered list of IDs, updates `sortOrder`
+
+Images are stored in GCS under `images/portfolio/` using timestamp-based filenames to avoid collisions. The existing `ImageProcessingService` generates original, optimized (1200px), and thumbnail (300px) variants.
+
+### Frontend Components
+
+```
+src/main/frontend/src/app/portfolio/
+├── portfolio.models.ts                # PortfolioItem TypeScript interface
+├── portfolio.service.ts               # HTTP client for all portfolio API endpoints
+├── portfolio-dialog/
+│   └── portfolio-dialog.ts            # Create/edit dialog with file picker + metadata fields
+└── portfolio-list/
+    ├── portfolio-list.ts              # Main component: grid view, signals-based state management
+    ├── portfolio-list.html            # Card grid with image overlay, reorder, empty state
+    └── portfolio-list.scss            # Material Design 3 styled card layout
+```
+
+### Key Features
+
+- **Card grid layout**: Square thumbnail cards (240px) with title, category chip, and description
+- **Image hover overlay**: Camera icon overlay on hover to replace an item's image without editing metadata
+- **Create dialog**: Drag-zone-styled file picker with title, description, and category fields
+- **Edit dialog**: Update metadata (title, description, category) without re-uploading the image
+- **Reorder**: Left/right chevron buttons on each card for adjusting display order
+- **Delete**: Confirmation dialog before deleting, with GCS asset cleanup
+- **Empty state**: Illustrated call-to-action when no items exist
+- **Upload progress**: Indeterminate progress bar during image processing
+- **Signals + zoneless**: All state managed via Angular signals with `provideZonelessChangeDetection()`
+- **Modern Angular**: Standalone component, `@if`/`@for` control flow, `viewChild()` signal query
