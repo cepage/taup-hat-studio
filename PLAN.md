@@ -2,13 +2,13 @@
 
 ## Overview
 
-TaupHat Studio is a content management system for [tauphat.com](https://tauphat.com/), the website of artist **Aurora Page**. The site serves three purposes:
+TaupHat Studio is a content management system for [tauphat.com](https://tauphat.com/). The site serves three purposes:
 
 1. **Webcomic publications** -- Multiple series (currently Citrine Clan with 53 issues), each with sequential image pages
 2. **Professional portfolio** -- Thumbnail gallery of artwork with full-screen browsing
-3. **Web store link** -- Links to her BigCartel shop
+3. **Web store link** -- Links to a BigCartel shop
 
-The CMS enables Aurora to manage all content and customize the site's visual identity (colors, fonts, images) without writing code. When she's ready, she publishes the site and the CMS generates static HTML/CSS/JS files deployed to Firebase Hosting.
+The CMS enables the site owner to manage all content and customize the site's visual identity (colors, fonts, images) without writing code. When ready, they publish the site and the CMS generates static HTML/CSS/JS files deployed to Firebase Hosting.
 
 ---
 
@@ -155,7 +155,7 @@ Singleton row storing the site's visual identity and metadata.
 
 ## Authentication
 
-Google OAuth2 flow restricted to Aurora's email address:
+Google OAuth2 flow restricted to the authorized user's email address:
 
 - Spring Security OAuth2 client configured with Google provider
 - `tauphat.security.allowed-email` config property restricts login to one email
@@ -180,7 +180,7 @@ Image processing uses the Thumbnailator library. Aspect ratio is always preserve
 
 ## Generated Static Site Pages
 
-When Aurora publishes, the CMS generates these pages using Thymeleaf templates:
+When the user publishes, the CMS generates these pages using Thymeleaf templates:
 
 | Page | URL Pattern | Description |
 |------|-------------|-------------|
@@ -194,7 +194,7 @@ When Aurora publishes, the CMS generates these pages using Thymeleaf templates:
 The static site includes:
 - Vanilla JS comic reader (prev/next page navigation, image zoom, keyboard shortcuts)
 - Lightbox gallery for the portfolio (thumbnail grid, full-screen viewer)
-- CSS generated from Aurora's theme choices (colors, fonts)
+- CSS generated from the user's theme choices (colors, fonts)
 - No framework -- plain HTML/CSS/JS for fast loading
 
 ---
@@ -206,7 +206,7 @@ The CMS deploys directly to Firebase Hosting via the REST API:
 1. `SiteGeneratorService.generate()` produces a `GeneratedSite` in memory (all HTML/CSS/JS)
 2. `FirebaseHostingService` creates a new version, uploads gzipped files with SHA-256 hashes, finalizes, and releases
 3. **Preview**: Deploys to a Firebase preview channel (temporary URL at `site--preview.web.app`) for staging review
-4. **Production**: Deploys to the live channel when Aurora clicks "Deploy to Production"
+4. **Production**: Deploys to the live channel when the user clicks "Deploy to Production"
 
 No Cloud Build, no GCS staging bucket, no `cloudbuild.yaml`, no `firebase.json`. Hosting config (cache headers) is set programmatically in the version creation API call.
 

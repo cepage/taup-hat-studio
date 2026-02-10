@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TaupHat Studio is a content management system for tauphat.com, the website of artist Aurora Page. It manages:
+TaupHat Studio is a content management system for tauphat.com, the website of a digital artist. It manages:
 - **Webcomic publications** (series, issues, pages)
 - **Portfolio** of artwork
 - **Site theming** (colors, fonts, images)
