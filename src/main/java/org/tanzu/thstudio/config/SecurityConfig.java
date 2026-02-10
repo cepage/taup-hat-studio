@@ -14,7 +14,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -72,19 +75,20 @@ public class SecurityConfig {
     }
 
     /**
-     * Custom OAuth2 user service that validates the user's email against the allowed email.
+     * Custom OAuth2 user service that validates the user's email against the allowed emails list.
      */
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
         var delegate = new DefaultOAuth2UserService();
+        Set<String> allowedEmails = parseAllowedEmails(properties.security().allowedEmails());
+
         return request -> {
             OAuth2User user = delegate.loadUser(request);
             String email = user.getAttribute("email");
-            String allowedEmail = properties.security().allowedEmail();
 
-            if (!allowedEmail.isBlank() && !allowedEmail.equalsIgnoreCase(email)) {
+            if (!allowedEmails.isEmpty() && (email == null || !allowedEmails.contains(email.toLowerCase()))) {
                 throw new org.springframework.security.access.AccessDeniedException(
-                        "Access denied. Only " + allowedEmail + " may log in.");
+                        "Access denied. Email " + email + " is not in the allowed list.");
             }
 
             return new DefaultOAuth2User(
@@ -93,5 +97,16 @@ public class SecurityConfig {
                     "email"
             );
         };
+    }
+
+    private static Set<String> parseAllowedEmails(String allowedEmails) {
+        if (allowedEmails == null || allowedEmails.isBlank()) {
+            return Set.of();
+        }
+        return Arrays.stream(allowedEmails.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .collect(Collectors.toUnmodifiableSet());
     }
 }

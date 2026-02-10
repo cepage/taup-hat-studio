@@ -12,9 +12,16 @@ import java.io.IOException;
 /**
  * Configures the Spring Boot server to forward non-API requests to the Angular SPA's index.html.
  * This allows Angular's client-side routing to handle all frontend routes.
+ * <p>
+ * The Angular build output is copied into {@code classpath:/static/} by the maven-resources-plugin
+ * during the prepare-package phase. Any request that does not match a real static file
+ * (e.g. an Angular route like {@code /dashboard}) is forwarded to {@code index.html}
+ * for client-side routing.
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private static final Resource INDEX_HTML = new ClassPathResource("/static/index.html");
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -27,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                         Resource requested = location.createRelative(resourcePath);
                         return requested.exists() && requested.isReadable()
                                 ? requested
-                                : new ClassPathResource("/static/browser/index.html");
+                                : INDEX_HTML;
                     }
                 });
     }

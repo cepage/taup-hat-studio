@@ -5,9 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "tauphat")
 public record TaupHatProperties(SecurityProperties security, GcsProperties gcs, FirebaseProperties firebase) {
 
-    public record SecurityProperties(String allowedEmail, boolean localMode) {
+    public record SecurityProperties(String allowedEmails, boolean localMode) {
         public SecurityProperties {
-            if (allowedEmail == null) allowedEmail = "";
+            if (allowedEmails == null) allowedEmails = "";
             // localMode defaults to false
         }
     }

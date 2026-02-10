@@ -1,0 +1,25 @@
+---
+applications:
+  - name: tauphat
+    memory: 1G
+    instances: 1
+    path: target/taup-hat-studio-1.0.0.jar
+    routes:
+      - route: tauphat.apps.tas-ndc.kuhn-labs.com
+    buildpacks:
+      - java_buildpack_offline
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      SPRING_PROFILES_ACTIVE: cloud
+      GCS_BUCKET_NAME: ((gcs-bucket-name))
+      GCS_PROJECT_ID: ((gcs-project-id))
+      FIREBASE_SITE_ID: ((firebase-site-id))
+      GOOGLE_CLIENT_ID: ((google-client-id))
+      GOOGLE_CLIENT_SECRET: ((google-client-secret))
+      TAUPHAT_ALLOWED_EMAILS: ((tauphat-allowed-emails))
+      GOOGLE_APPLICATION_CREDENTIALS: /home/vcap/app/.google/credentials.json
+      GOOGLE_CREDENTIALS_JSON: ((google-credentials-json))
+    services:
+      - th-db
+    health-check-type: http
+    health-check-http-endpoint: /actuator/health
