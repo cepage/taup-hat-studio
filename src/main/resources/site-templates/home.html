@@ -8,7 +8,8 @@
 
   <main class="site-main">
     <!-- Hero section -->
-    <section th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero">
+    <section th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero"
+             data-aos="zoom-in" data-aos-duration="1000">
       <img th:src="${config.heroImageUrl}" alt="Hero" class="hero-image">
       <div class="hero-overlay">
         <h1 th:text="${siteName}">Site Name</h1>
@@ -21,7 +22,7 @@
     </section>
 
     <!-- Latest comic section -->
-    <section th:if="${latestIssue != null}">
+    <section th:if="${latestIssue != null}" data-aos="fade-up">
       <div class="section-header">
         <h2>Latest Comic</h2>
         <a href="/comics/">View all comics &rarr;</a>
@@ -42,12 +43,13 @@
 
     <!-- Comics series section -->
     <section th:if="${!activeSeries.isEmpty()}" class="section-spacer">
-      <div class="section-header">
+      <div class="section-header" data-aos="fade-up">
         <h2>Comics</h2>
         <a href="/comics/">View all &rarr;</a>
       </div>
       <div class="card-grid">
-        <a class="card" th:each="series : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'">
+        <a class="card" th:each="series, iter : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'"
+           data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
           <img th:if="${series.coverImageUrl != null}"
                th:src="${series.coverImageUrl}"
                th:alt="${series.title}"
@@ -62,12 +64,13 @@
 
     <!-- Portfolio preview section -->
     <section th:if="${!portfolioItems.isEmpty()}" class="section-spacer">
-      <div class="section-header">
+      <div class="section-header" data-aos="fade-up">
         <h2>Portfolio</h2>
         <a href="/portfolio/">View all &rarr;</a>
       </div>
       <div class="thumbnail-grid">
-        <div class="thumbnail-item" th:each="item : ${portfolioItems}">
+        <div class="thumbnail-item" th:each="item, iter : ${portfolioItems}"
+             data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
           <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
                th:alt="${item.title}">
           <div class="thumbnail-caption" th:text="${item.title}">Item Title</div>
@@ -77,5 +80,6 @@
   </main>
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

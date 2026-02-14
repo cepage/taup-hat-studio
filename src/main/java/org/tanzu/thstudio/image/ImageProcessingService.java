@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,6 +49,11 @@ public class ImageProcessingService {
         // Read file bytes once so the input stream can be reused for resizing
         byte[] originalBytes = file.getBytes();
 
+        // Read original image dimensions for PhotoSwipe lightbox integration
+        BufferedImage buffered = ImageIO.read(new ByteArrayInputStream(originalBytes));
+        int width = buffered != null ? buffered.getWidth() : 0;
+        int height = buffered != null ? buffered.getHeight() : 0;
+
         // Upload original in its native format
         String originalPath = basePath + "/original/" + filename + extension;
         String originalUrl = storageService.upload(originalPath, originalBytes, contentType);
@@ -61,10 +68,10 @@ public class ImageProcessingService {
         String thumbnailPath = basePath + "/thumbnail/" + filename + RESIZED_EXTENSION;
         String thumbnailUrl = storageService.upload(thumbnailPath, thumbnail, RESIZED_CONTENT_TYPE);
 
-        log.info("Processed image {} -> original ({}), optimized ({}px), thumbnail ({}px)",
-                filename, contentType, OPTIMIZED_WIDTH, THUMBNAIL_WIDTH);
+        log.info("Processed image {} -> original ({}), optimized ({}px), thumbnail ({}px), dimensions {}x{}",
+                filename, contentType, OPTIMIZED_WIDTH, THUMBNAIL_WIDTH, width, height);
 
-        return new ImageUrls(originalUrl, optimizedUrl, thumbnailUrl);
+        return new ImageUrls(originalUrl, optimizedUrl, thumbnailUrl, width, height);
     }
 
     /**
@@ -94,8 +101,9 @@ public class ImageProcessingService {
     }
 
     /**
-     * URLs for the three image size variants.
+     * URLs for the three image size variants, plus original image dimensions.
      */
-    public record ImageUrls(String originalUrl, String optimizedUrl, String thumbnailUrl) {
+    public record ImageUrls(String originalUrl, String optimizedUrl, String thumbnailUrl,
+                            int width, int height) {
     }
 }

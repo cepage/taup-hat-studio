@@ -28,7 +28,7 @@ The CMS is built with:
   - `portfolio` – PortfolioItem entity, repository, controller
   - `site` – SiteConfig entity, repository, service, controller
   - `image` – StorageService (GCS), ImageProcessingService (Thumbnailator)
-  - `publish` – Static site generator, Cloud Build trigger (Phase 5+)
+  - `publish` – Static site generator, Firebase Hosting deployment (REST API)
 - Database migrations: `src/main/resources/db/migration/` (Flyway)
 - Application properties: `src/main/resources/application.properties`
 - Profiles: `local` (H2 + no auth), `cloud` (Postgres + OAuth), `test`
@@ -93,6 +93,7 @@ ng test
 - **Zoneless**: Uses `provideZonelessChangeDetection()` for optimal performance
 - **Material Design 3**: Pre-configured with `mat.theme()` and system variables
 - **Styling**: SCSS with Material 3 design tokens (e.g. `var(--mat-sys-primary)`)
+- **Testing**: Vitest with happy-dom (instead of Karma/Jasmine)
 - **Prettier**: Configured with 100 character line width and single quotes
 
 ### Backend
@@ -113,15 +114,58 @@ ng test
 - GCS credentials via environment variables or application default credentials
 - `cloud` profile activated automatically on Cloud Foundry
 
+### Image Processing Workflow
+- **Upload**: Images uploaded via CMS (webcomic pages, portfolio items, site assets)
+- **Processing**: Thumbnailator creates three versions:
+  - `thumbnail` – Small preview (max 300px width)
+  - `optimized` – Web-optimized display version (max 1200px width, 85% quality)
+  - `original` – Full-resolution original
+- **Storage**: All versions stored in Google Cloud Storage
+- **Metadata**: Image dimensions stored in database (added in V2 migration)
+- **Formats**: Supports JPEG, PNG, WebP via TwelveMonkeys ImageIO
+
 ## Build Integration
 
 The Maven build automatically:
-1. Installs Node.js v24.13.0 and npm in `target/`
+1. Installs Node.js v25.6.0 and npm in `target/`
 2. Runs `npm ci` to install frontend dependencies
 3. Executes `ng build` to create production frontend build
-4. Packages everything into a single Spring Boot JAR
+4. Copies frontend build output from `src/main/frontend/dist/frontend/browser/` to `target/classes/static/`
+5. Packages everything into a single Spring Boot JAR
 
-Frontend build output goes to `dist/` and gets served by Spring Boot as static resources.
+Frontend build output gets served by Spring Boot as static resources at the root path.
+
+## Cloud Foundry Deployment
+
+Deploy to Cloud Foundry after building the JAR:
+
+```bash
+./mvnw clean package
+cf push
+```
+
+The `manifest.yml` configures:
+- **PostgreSQL service**: `th-db` (auto-configured by java-cfenv-boot)
+- **Memory**: 1G
+- **Profile**: `cloud` (automatically activated)
+- **Buildpack**: Java Buildpack with JRE 21
+- **Health check**: HTTP endpoint at `/actuator/health`
+
+Required environment variables (defined in manifest.yml with credential placeholders):
+- `GCS_BUCKET_NAME`, `GCS_PROJECT_ID` – Google Cloud Storage configuration
+- `FIREBASE_SITE_ID` – Firebase Hosting site identifier
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` – OAuth2 credentials
+- `TAUPHAT_ALLOWED_EMAILS` – Authorized email address for CMS access
+- `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_CREDENTIALS_JSON` – GCP service account credentials
+
+## Static Site Generation
+
+The publish feature generates a static site from Thymeleaf templates and deploys directly to Firebase Hosting:
+- **Templates**: Located in `src/main/resources/site-templates/`
+- **Assets**: Vanilla JavaScript in `src/main/resources/site-assets/` (comic reader, portfolio lightbox)
+- **Output**: Framework-free HTML/CSS/JS static site
+- **Deployment**: Direct to Firebase Hosting via REST API (no Cloud Build, no staging bucket)
+- **Preview**: Supports Firebase preview channels for staging review before production deployment
 
 ## Code Style Preferences
 

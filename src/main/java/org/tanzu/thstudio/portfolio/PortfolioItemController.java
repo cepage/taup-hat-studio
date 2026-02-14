@@ -72,6 +72,8 @@ public class PortfolioItemController {
         item.setImageUrl(urls.originalUrl());
         item.setThumbnailUrl(urls.thumbnailUrl());
         item.setOptimizedUrl(urls.optimizedUrl());
+        item.setImageWidth(urls.width());
+        item.setImageHeight(urls.height());
 
         var saved = portfolioRepository.save(item);
         return ResponseEntity
@@ -109,6 +111,8 @@ public class PortfolioItemController {
                         existing.setImageUrl(urls.originalUrl());
                         existing.setThumbnailUrl(urls.thumbnailUrl());
                         existing.setOptimizedUrl(urls.optimizedUrl());
+                        existing.setImageWidth(urls.width());
+                        existing.setImageHeight(urls.height());
 
                         return ResponseEntity.ok(portfolioRepository.save(existing));
                     } catch (IOException e) {

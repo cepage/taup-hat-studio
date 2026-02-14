@@ -7,21 +7,22 @@
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
-    <div class="section-header">
+    <div class="section-header" data-aos="fade-up">
       <h2 th:text="${series.title}">Series Title</h2>
       <a href="/comics/">&larr; All Comics</a>
     </div>
 
     <p th:if="${series.description != null}" style="margin-bottom: 2rem; color: var(--color-text-muted); max-width: 720px;"
-       th:text="${series.description}">Description</p>
+       th:text="${series.description}" data-aos="fade-up" data-aos-delay="100">Description</p>
 
     <div th:if="${issues.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
       <p>No issues published yet. Check back soon!</p>
     </div>
 
     <div class="card-grid">
-      <a class="card" th:each="issue : ${issues}"
-         th:href="'/comics/' + ${series.slug} + '/' + ${issue.issueNumber} + '/'">
+      <a class="card" th:each="issue, iter : ${issues}"
+         th:href="'/comics/' + ${series.slug} + '/' + ${issue.issueNumber} + '/'"
+         data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
         <img th:if="${issue.coverImageUrl != null}"
              th:src="${issue.coverImageUrl}"
              th:alt="${issue.title}"
@@ -35,5 +36,6 @@
   </main>
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

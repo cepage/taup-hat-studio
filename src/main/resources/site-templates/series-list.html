@@ -7,7 +7,7 @@
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
-    <div class="section-header">
+    <div class="section-header" data-aos="fade-up">
       <h2>Comics</h2>
     </div>
 
@@ -16,7 +16,8 @@
     </div>
 
     <div class="card-grid">
-      <a class="card" th:each="series : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'">
+      <a class="card" th:each="series, iter : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'"
+         data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
         <img th:if="${series.coverImageUrl != null}"
              th:src="${series.coverImageUrl}"
              th:alt="${series.title}"
@@ -30,5 +31,6 @@
   </main>
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
