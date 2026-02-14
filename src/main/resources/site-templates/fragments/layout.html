@@ -9,6 +9,8 @@
   <meta name="generator" content="TaupHat Studio">
   <title th:text="${pageTitle} + ' — ' + ${siteName}" />
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
 </head>
 
 <!-- Site header with navigation -->
@@ -31,4 +33,19 @@
 <footer th:fragment="footer" class="site-footer">
   <p>&copy; <span th:text="${year}">2026</span> <span th:text="${siteName}">Site Name</span>. All rights reserved.</p>
 </footer>
+
+<!-- Scripts fragment with PhotoSwipe, AOS, and initialization -->
+<div th:fragment="scripts">
+  <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe-lightbox.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.umd.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true,
+      offset: 50,
+    });
+  </script>
+</div>
 </html>

@@ -7,7 +7,7 @@
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
-    <div class="section-header">
+    <div class="section-header" data-aos="fade-up">
       <h2>Portfolio</h2>
     </div>
 
@@ -15,39 +15,25 @@
       <p>No artwork available yet. Check back soon!</p>
     </div>
 
-    <div class="thumbnail-grid">
-      <div class="thumbnail-item" th:each="item, iter : ${portfolioItems}"
-           th:data-index="${iter.index}"
-           th:data-src="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
-           th:data-title="${item.title}"
-           th:data-description="${item.description}"
-           onclick="openLightbox(this.dataset.index)">
+    <div class="thumbnail-grid pswp-gallery" id="portfolio-gallery">
+      <a class="thumbnail-item"
+         th:each="item, iter : ${portfolioItems}"
+         th:href="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
+         th:attr="data-pswp-width=${item.imageWidth != null ? item.imageWidth : 1200},
+                  data-pswp-height=${item.imageHeight != null ? item.imageHeight : 900},
+                  data-pswp-caption=${item.title + (item.description != null ? ' &mdash; ' + item.description : '')},
+                  data-aos-delay=${iter.index * 100}"
+         target="_blank"
+         data-aos="fade-up">
         <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
              th:alt="${item.title}">
         <div class="thumbnail-caption" th:text="${item.title}">Item Title</div>
-      </div>
+      </a>
     </div>
-
-    <!-- Lightbox overlay -->
-    <div class="lightbox-overlay" id="lightbox">
-      <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
-      <button class="lightbox-prev" onclick="lightboxPrev()" aria-label="Previous">&#8249;</button>
-      <div class="lightbox-content">
-        <img id="lightboxImage" src="" alt="">
-        <div class="lightbox-caption" id="lightboxCaption"></div>
-      </div>
-      <button class="lightbox-next" onclick="lightboxNext()" aria-label="Next">&#8250;</button>
-    </div>
-
-    <!-- Portfolio data for JavaScript -->
-    <script th:inline="javascript">
-      /*<![CDATA[*/
-      var portfolioData = /*[[${portfolioJson}]]*/ [];
-      /*]]>*/
-    </script>
   </main>
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
   <script src="/js/portfolio-lightbox.js"></script>
 </body>
 </html>

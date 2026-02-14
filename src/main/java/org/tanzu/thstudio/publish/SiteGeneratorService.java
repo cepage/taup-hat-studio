@@ -193,18 +193,6 @@ public class SiteGeneratorService {
     private String renderPortfolio(SiteConfig config, List<PortfolioItem> items) {
         var ctx = baseContext(config);
         ctx.setVariable("portfolioItems", items);
-
-        // Provide clean portfolio data for JavaScript (lightbox)
-        var portfolioJson = items.stream().map(item -> {
-            var map = new LinkedHashMap<String, Object>();
-            map.put("title", item.getTitle());
-            map.put("description", item.getDescription());
-            map.put("imageUrl", item.getImageUrl());
-            map.put("optimizedUrl", item.getOptimizedUrl());
-            return map;
-        }).toList();
-        ctx.setVariable("portfolioJson", portfolioJson);
-
         return templateEngine.process("portfolio", ctx);
     }
 
@@ -602,83 +590,20 @@ public class SiteGeneratorService {
                   font-weight: 500;
                 }
                 
-                /* ── Lightbox ───────────────────────────────────────────── */
+                /* ── PhotoSwipe Caption ─────────────────────────────────── */
                 
-                .lightbox-overlay {
-                  position: fixed;
-                  inset: 0;
-                  background: rgba(0,0,0,0.92);
-                  z-index: 1000;
-                  display: none;
-                  align-items: center;
-                  justify-content: center;
-                  flex-direction: column;
-                }
-                .lightbox-overlay.active {
-                  display: flex;
-                }
-                
-                .lightbox-content {
-                  position: relative;
-                  max-width: 90vw;
-                  max-height: 85vh;
-                }
-                
-                .lightbox-content img {
-                  max-width: 90vw;
-                  max-height: 80vh;
-                  object-fit: contain;
-                  border-radius: var(--radius);
-                }
-                
-                .lightbox-caption {
+                .pswp__custom-caption {
                   color: #fff;
                   text-align: center;
-                  padding: 1rem;
-                  font-size: 1rem;
-                }
-                
-                .lightbox-close {
+                  padding: 0.75rem 1rem;
+                  font-size: 0.95rem;
                   position: absolute;
-                  top: 1rem;
-                  right: 1.5rem;
-                  color: #fff;
-                  font-size: 2rem;
-                  cursor: pointer;
-                  z-index: 1001;
-                  background: none;
-                  border: none;
-                  line-height: 1;
-                  opacity: 0.8;
-                  transition: opacity 0.2s;
+                  bottom: 0;
+                  left: 0;
+                  right: 0;
+                  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+                  pointer-events: none;
                 }
-                .lightbox-close:hover { opacity: 1; }
-                
-                .lightbox-prev,
-                .lightbox-next {
-                  position: absolute;
-                  top: 50%%;
-                  transform: translateY(-50%%);
-                  color: #fff;
-                  font-size: 2.5rem;
-                  cursor: pointer;
-                  background: rgba(0,0,0,0.3);
-                  border: none;
-                  border-radius: 50%%;
-                  width: 48px;
-                  height: 48px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  transition: background 0.2s;
-                  z-index: 1001;
-                }
-                .lightbox-prev:hover,
-                .lightbox-next:hover {
-                  background: rgba(0,0,0,0.6);
-                }
-                .lightbox-prev { left: 1rem; }
-                .lightbox-next { right: 1rem; }
                 
                 /* ── About Page ─────────────────────────────────────────── */
                 
