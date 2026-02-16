@@ -12,6 +12,9 @@ import org.tanzu.thstudio.config.TaupHatProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Service for uploading and managing files in Google Cloud Storage.
@@ -72,6 +75,33 @@ public class StorageService {
      */
     public String upload(String path, InputStream content, String contentType) throws IOException {
         return upload(path, content.readAllBytes(), contentType);
+    }
+
+    /**
+     * Uploads a file from a local Path to GCS, streaming its content to avoid
+     * loading the entire file into heap or direct buffer memory.
+     *
+     * @param path        the object path within the bucket
+     * @param sourceFile  local file to upload
+     * @param contentType the MIME type
+     * @return the public URL of the uploaded object
+     */
+    public String upload(String path, Path sourceFile, String contentType) throws IOException {
+        String bucket = properties.gcs().bucketName();
+        BlobId blobId = BlobId.of(bucket, path);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(contentType)
+                .build();
+        try (var channel = getStorage().writer(blobInfo);
+             var inputStream = Files.newInputStream(sourceFile)) {
+            byte[] buffer = new byte[64 * 1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                channel.write(ByteBuffer.wrap(buffer, 0, bytesRead));
+            }
+        }
+        log.info("Uploaded {} to gs://{}/{} (streamed from disk)", contentType, bucket, path);
+        return publicUrl(bucket, path);
     }
 
     /**

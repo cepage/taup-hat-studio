@@ -10,6 +10,7 @@ applications:
       - java_buildpack_offline
     env:
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      JAVA_OPTS: '-XX:MaxDirectMemorySize=64m'
       SPRING_PROFILES_ACTIVE: cloud
       GCS_BUCKET_NAME: ((gcs-bucket-name))
       GCS_PROJECT_ID: ((gcs-project-id))
