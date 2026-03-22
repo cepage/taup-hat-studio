@@ -581,6 +581,9 @@ public class SiteGeneratorService {
                   gap: 0.5rem;
                   width: 140px;
                   text-align: center;
+                  text-decoration: none;
+                  color: inherit;
+                  cursor: pointer;
                 }
                 
                 .project-circle-title {

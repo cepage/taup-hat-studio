@@ -56,7 +56,7 @@
         <a href="/portfolio/">View all &rarr;</a>
       </div>
       <div class="project-circles">
-        <div class="project-circle-item" th:each="item, iter : ${portfolioItems}"
+        <a class="project-circle-item" href="/portfolio/" th:each="item, iter : ${portfolioItems}"
              data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 120}">
           <span class="project-circle-title" th:text="${item.title}">Title</span>
           <div class="project-circle-img-wrap">
@@ -64,7 +64,7 @@
                  th:alt="${item.title}">
           </div>
           <span th:if="${item.category != null}" class="project-circle-subtitle" th:text="${item.category}">Category</span>
-        </div>
+        </a>
       </div>
     </section>
 
