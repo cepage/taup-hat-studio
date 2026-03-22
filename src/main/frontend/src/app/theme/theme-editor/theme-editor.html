@@ -35,10 +35,33 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+          <mat-label>Site Taglines</mat-label>
+          <input
+            matInput
+            [(ngModel)]="cfg.siteTaglines"
+            placeholder="Illustrator, Digital Designer, Comic Artist"
+          />
+          <mat-icon matPrefix>auto_awesome</mat-icon>
+          <mat-hint>Comma-separated taglines that rotate in the hero section</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>BigCartel Store URL</mat-label>
           <input matInput [(ngModel)]="cfg.bigcartelUrl" placeholder="https://yourstore.bigcartel.com" />
           <mat-icon matPrefix>store</mat-icon>
           <mat-hint>Link to your BigCartel shop</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Commissions Email</mat-label>
+          <input
+            matInput
+            [(ngModel)]="cfg.commissionsEmail"
+            placeholder="commissions@example.com"
+            type="email"
+          />
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-hint>Email address used for the commissions contact form</mat-hint>
         </mat-form-field>
       </mat-card-content>
     </mat-card>

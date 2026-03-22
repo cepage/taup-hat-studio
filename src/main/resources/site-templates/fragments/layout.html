@@ -22,6 +22,7 @@
       <a href="/">Home</a>
       <a href="/comics/">Comics</a>
       <a href="/portfolio/">Portfolio</a>
+      <a href="/commissions/">Commissions</a>
       <a href="/about/">About</a>
       <a th:if="${config.bigcartelUrl != null and !config.bigcartelUrl.isEmpty()}"
          th:href="${config.bigcartelUrl}" target="_blank" rel="noopener">Shop</a>
@@ -34,11 +35,15 @@
   <p>&copy; <span th:text="${year}">2026</span> <span th:text="${siteName}">Site Name</span>. All rights reserved.</p>
 </footer>
 
-<!-- Scripts fragment with PhotoSwipe, AOS, and initialization -->
+<!-- Stars background container -->
+<div th:fragment="stars" class="stars-container" id="starsContainer"></div>
+
+<!-- Scripts fragment with PhotoSwipe, AOS, stars, and initialization -->
 <div th:fragment="scripts">
   <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe-lightbox.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.umd.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="/js/stars.js"></script>
   <script>
     AOS.init({
       duration: 800,

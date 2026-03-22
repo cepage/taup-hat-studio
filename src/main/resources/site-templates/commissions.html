@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Commissions')}">
+  <title>Commissions</title>
+</head>
+<body class="page-fade-in">
+  <div th:replace="~{fragments/layout :: stars}"></div>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main">
+    <div class="commissions-container" data-aos="fade-up">
+      <h1>Commissions</h1>
+      <p class="commissions-intro">
+        Interested in commissioning a piece? Fill out the form below and I'll get back to you as soon as possible.
+      </p>
+
+      <form class="commissions-form"
+            th:action="${commissionsEmail != null ? 'mailto:' + commissionsEmail : '#'}"
+            method="POST"
+            enctype="text/plain">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Your name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone <span class="optional">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="Your phone number">
+        </div>
+
+        <div class="form-group">
+          <label for="commission-type">Type of Commission</label>
+          <select id="commission-type" name="commission-type">
+            <option value="">Select a type...</option>
+            <option value="illustration">Illustration</option>
+            <option value="character-design">Character Design</option>
+            <option value="comic-page">Comic Page</option>
+            <option value="digital-painting">Digital Painting</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="5" required
+                    placeholder="Describe what you'd like commissioned..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Budget Range <span class="optional">(optional)</span></label>
+          <input type="text" id="budget" name="budget" placeholder="e.g. $50–$200">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">Send Request</button>
+      </form>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

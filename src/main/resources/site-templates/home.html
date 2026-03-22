@@ -3,26 +3,73 @@
 <head th:replace="~{fragments/layout :: head('Home')}">
   <title>Home</title>
 </head>
-<body>
+<body class="page-fade-in">
+  <div th:replace="~{fragments/layout :: stars}"></div>
   <header th:replace="~{fragments/layout :: header}"></header>
 
-  <main class="site-main">
-    <!-- Hero section -->
-    <section th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero"
-             data-aos="zoom-in" data-aos-duration="1000">
-      <img th:src="${config.heroImageUrl}" alt="Hero" class="hero-image">
-      <div class="hero-overlay">
-        <h1 th:text="${siteName}">Site Name</h1>
-        <p th:if="${latestIssue != null}">
-          Latest: <a th:href="'/comics/' + ${latestIssueSeries.slug} + '/' + ${latestIssue.issueNumber} + '/'"
-                     th:text="${latestIssueSeries.title + ' — ' + latestIssue.title}"
-                     style="color: #fff; text-decoration: underline;">Latest issue</a>
-        </p>
+  <main class="site-main home-main">
+    <!-- Hero section with rotating taglines -->
+    <section class="hero-landing" data-aos="fade" data-aos-duration="1200">
+      <div th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero-landing-bg">
+        <img th:src="${config.heroImageUrl}" alt="" class="hero-landing-bg-img">
+      </div>
+      <div class="hero-landing-content">
+        <h1 class="hero-title" th:text="${siteName}">Site Name</h1>
+        <div th:if="${taglines != null and !taglines.isEmpty()}" class="tagline-rotator">
+          <span class="tagline" th:each="tagline, iter : ${taglines}"
+                th:text="${tagline}"
+                th:styleappend="'animation-delay: ' + ${iter.index * (8 / taglines.size())} + 's'"
+                th:classappend="${iter.index == 0} ? ' tagline-active' : ''">Tagline</span>
+        </div>
       </div>
     </section>
 
-    <!-- Latest comic section -->
-    <section th:if="${latestIssue != null}" data-aos="fade-up">
+    <!-- Prominent nav buttons -->
+    <section class="nav-buttons" data-aos="fade-up" data-aos-delay="200">
+      <a href="/comics/" class="nav-btn">Comics</a>
+      <a href="/portfolio/" class="nav-btn">Portfolio</a>
+      <a href="/commissions/" class="nav-btn">Commissions</a>
+      <a th:if="${config.bigcartelUrl != null and !config.bigcartelUrl.isEmpty()}"
+         th:href="${config.bigcartelUrl}" target="_blank" rel="noopener" class="nav-btn">Shop</a>
+    </section>
+
+    <!-- About section (inline on home page) -->
+    <section class="home-about" data-aos="fade-up">
+      <div class="home-about-text">
+        <h2>About</h2>
+        <p th:if="${config.aboutText != null and !config.aboutText.isEmpty()}"
+           th:text="${config.aboutText}">About the artist.</p>
+        <p th:if="${config.aboutText == null or config.aboutText.isEmpty()}">
+          More information coming soon.
+        </p>
+        <a href="/about/" class="btn btn-primary">Learn more &rarr;</a>
+      </div>
+      <div th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="home-about-image">
+        <img th:src="${config.heroImageUrl}" alt="About" class="about-preview-img">
+      </div>
+    </section>
+
+    <!-- Portfolio / Projects preview (circular) -->
+    <section th:if="${!portfolioItems.isEmpty()}" class="home-projects" data-aos="fade-up">
+      <div class="section-header">
+        <h2>Work</h2>
+        <a href="/portfolio/">View all &rarr;</a>
+      </div>
+      <div class="project-circles">
+        <div class="project-circle-item" th:each="item, iter : ${portfolioItems}"
+             data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 120}">
+          <span class="project-circle-title" th:text="${item.title}">Title</span>
+          <div class="project-circle-img-wrap">
+            <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
+                 th:alt="${item.title}">
+          </div>
+          <span th:if="${item.category != null}" class="project-circle-subtitle" th:text="${item.category}">Category</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest comic teaser -->
+    <section th:if="${latestIssue != null}" class="home-latest-comic" data-aos="fade-up">
       <div class="section-header">
         <h2>Latest Comic</h2>
         <a href="/comics/">View all comics &rarr;</a>
@@ -38,43 +85,6 @@
             <p th:text="${latestIssue.title}">Issue Title</p>
           </div>
         </a>
-      </div>
-    </section>
-
-    <!-- Comics series section -->
-    <section th:if="${!activeSeries.isEmpty()}" class="section-spacer">
-      <div class="section-header" data-aos="fade-up">
-        <h2>Comics</h2>
-        <a href="/comics/">View all &rarr;</a>
-      </div>
-      <div class="card-grid">
-        <a class="card" th:each="series, iter : ${activeSeries}" th:href="'/comics/' + ${series.slug} + '/'"
-           data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
-          <img th:if="${series.coverImageUrl != null}"
-               th:src="${series.coverImageUrl}"
-               th:alt="${series.title}"
-               class="card-image">
-          <div class="card-body">
-            <h3 th:text="${series.title}">Series Title</h3>
-            <p th:if="${series.description != null}" th:text="${series.description}">Description</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <!-- Portfolio preview section -->
-    <section th:if="${!portfolioItems.isEmpty()}" class="section-spacer">
-      <div class="section-header" data-aos="fade-up">
-        <h2>Portfolio</h2>
-        <a href="/portfolio/">View all &rarr;</a>
-      </div>
-      <div class="thumbnail-grid">
-        <div class="thumbnail-item" th:each="item, iter : ${portfolioItems}"
-             data-aos="fade-up" th:attr="data-aos-delay=${iter.index * 100}">
-          <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
-               th:alt="${item.title}">
-          <div class="thumbnail-caption" th:text="${item.title}">Item Title</div>
-        </div>
       </div>
     </section>
   </main>

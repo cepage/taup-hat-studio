@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,7 @@ public class SiteGeneratorService {
         // Generate JS assets
         site.addJs("js/comic-reader.js", loadStaticAsset("site-assets/comic-reader.js"));
         site.addJs("js/portfolio-lightbox.js", loadStaticAsset("site-assets/portfolio-lightbox.js"));
+        site.addJs("js/stars.js", loadStaticAsset("site-assets/stars.js"));
 
         // Home page
         site.addHtml("index.html", renderHome(config, activeSeries, portfolioItems));
@@ -106,6 +108,9 @@ public class SiteGeneratorService {
         // Portfolio page
         site.addHtml("portfolio/index.html", renderPortfolio(config, portfolioItems));
 
+        // Commissions page
+        site.addHtml("commissions/index.html", renderCommissions(config));
+
         // About page
         site.addHtml("about/index.html", renderAbout(config));
 
@@ -120,6 +125,7 @@ public class SiteGeneratorService {
         var ctx = baseContext(config);
         ctx.setVariable("activeSeries", activeSeries);
         ctx.setVariable("portfolioItems", portfolioItems.stream().limit(8).toList());
+        ctx.setVariable("taglines", parseTaglines(config.getSiteTaglines()));
 
         // Find latest issue from the first active series
         if (!activeSeries.isEmpty()) {
@@ -202,6 +208,12 @@ public class SiteGeneratorService {
         return templateEngine.process("about", ctx);
     }
 
+    private String renderCommissions(SiteConfig config) {
+        var ctx = baseContext(config);
+        ctx.setVariable("commissionsEmail", config.getCommissionsEmail());
+        return templateEngine.process("commissions", ctx);
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────
 
     private Context baseContext(SiteConfig config) {
@@ -225,11 +237,26 @@ public class SiteGeneratorService {
         }
     }
 
+    private List<String> parseTaglines(String taglines) {
+        if (taglines == null || taglines.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(taglines.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }
+
     /**
      * Generates the main stylesheet from the site configuration theme values.
      */
     private String generateStyleCss(SiteConfig config) {
         var googleFontsImport = buildGoogleFontsImport(config.getHeadingFont(), config.getBodyFont());
+
+        var taglines = parseTaglines(config.getSiteTaglines());
+        int taglineCount = Math.max(taglines.size(), 1);
+        double cycleDuration = taglineCount * 3.0;
+
         return googleFontsImport + """
                 
                 /* ── Reset & Base ───────────────────────────────────────── */
@@ -254,6 +281,8 @@ public class SiteGeneratorService {
                   --max-width: 1200px;
                   --radius: 8px;
                   --shadow: 0 2px 8px rgba(0,0,0,0.08);
+                  --tagline-count: %d;
+                  --tagline-cycle: %.1fs;
                 }
                 
                 html {
@@ -269,6 +298,19 @@ public class SiteGeneratorService {
                   min-height: 100vh;
                   display: flex;
                   flex-direction: column;
+                  position: relative;
+                  overflow-x: hidden;
+                }
+                
+                /* ── Page Load Fade-In ──────────────────────────────────── */
+                
+                .page-fade-in {
+                  animation: pageFadeIn 1s ease-out forwards;
+                }
+                
+                @keyframes pageFadeIn {
+                  from { opacity: 0; transform: translateY(12px); }
+                  to   { opacity: 1; transform: translateY(0); }
                 }
                 
                 a {
@@ -292,11 +334,33 @@ public class SiteGeneratorService {
                   color: var(--color-primary);
                 }
                 
+                /* ── Star Decorations ───────────────────────────────────── */
+                
+                .stars-container {
+                  position: fixed;
+                  inset: 0;
+                  pointer-events: none;
+                  z-index: 0;
+                  overflow: hidden;
+                }
+                
+                .star-decoration {
+                  position: absolute;
+                  color: var(--color-primary);
+                  opacity: 0;
+                  animation: starTwinkle 4s ease-in-out infinite alternate;
+                  transition: opacity 0.6s ease;
+                }
+                
+                @keyframes starTwinkle {
+                  0%%   { transform: scale(0.85) rotate(0deg); }
+                  100%% { transform: scale(1.15) rotate(15deg); }
+                }
+                
                 /* ── Layout ─────────────────────────────────────────────── */
                 
                 .site-header {
-                  background: var(--color-surface);
-                  border-bottom: 2px solid var(--color-primary);
+                  background: var(--color-primary);
                   padding: 0.75rem 1.5rem;
                   position: sticky;
                   top: 0;
@@ -316,7 +380,10 @@ public class SiteGeneratorService {
                   font-family: var(--font-heading);
                   font-size: 1.5rem;
                   font-weight: 700;
-                  color: var(--color-primary);
+                  color: #fff;
+                }
+                .site-logo:hover {
+                  color: var(--color-secondary);
                 }
                 
                 .site-nav {
@@ -328,15 +395,15 @@ public class SiteGeneratorService {
                 .site-nav a {
                   font-size: 0.95rem;
                   font-weight: 500;
-                  color: var(--color-text);
+                  color: rgba(255,255,255,0.85);
                   padding: 0.25rem 0;
                   border-bottom: 2px solid transparent;
                   transition: border-color 0.2s, color 0.2s;
                 }
                 .site-nav a:hover,
                 .site-nav a.active {
-                  color: var(--color-primary);
-                  border-bottom-color: var(--color-primary);
+                  color: #fff;
+                  border-bottom-color: var(--color-secondary);
                 }
                 
                 .site-main {
@@ -345,57 +412,213 @@ public class SiteGeneratorService {
                   margin: 0 auto;
                   padding: 2rem 1.5rem;
                   width: 100%%;
+                  position: relative;
+                  z-index: 1;
                 }
                 
                 .site-footer {
-                  background: var(--color-surface);
-                  border-top: 1px solid var(--color-border);
+                  background: var(--color-primary);
                   padding: 1.5rem;
                   text-align: center;
-                  color: var(--color-text-muted);
+                  color: rgba(255,255,255,0.7);
                   font-size: 0.85rem;
+                  position: relative;
+                  z-index: 1;
                 }
                 
-                /* ── Hero Section ───────────────────────────────────────── */
+                /* ── Hero Landing ───────────────────────────────────────── */
                 
-                .hero {
+                .hero-landing {
                   position: relative;
                   border-radius: var(--radius);
                   overflow: hidden;
-                  margin-bottom: 3rem;
+                  margin-bottom: 2.5rem;
                   background: var(--color-primary);
-                  min-height: 320px;
+                  min-height: 420px;
                   display: flex;
-                  align-items: flex-end;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
                 }
                 
-                .hero-image {
+                .hero-landing-bg {
                   position: absolute;
                   inset: 0;
+                }
+                
+                .hero-landing-bg-img {
                   width: 100%%;
                   height: 100%%;
                   object-fit: cover;
-                  opacity: 0.7;
+                  opacity: 0.35;
                 }
                 
-                .hero-overlay {
+                .hero-landing-content {
                   position: relative;
                   z-index: 1;
-                  padding: 2rem;
-                  width: 100%%;
-                  background: linear-gradient(transparent, rgba(0,0,0,0.6));
-                  color: #fff;
+                  padding: 3rem 2rem;
                 }
                 
-                .hero-overlay h1 {
+                .hero-title {
                   color: #fff;
-                  font-size: 2.5rem;
+                  font-size: 4rem;
+                  font-weight: 700;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
                   margin-bottom: 0.5rem;
+                  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
                 }
                 
-                .hero-overlay p {
-                  font-size: 1.1rem;
-                  opacity: 0.9;
+                .tagline-rotator {
+                  position: relative;
+                  height: 2rem;
+                  overflow: hidden;
+                }
+                
+                .tagline {
+                  position: absolute;
+                  width: 100%%;
+                  left: 0;
+                  color: var(--color-secondary);
+                  font-family: var(--font-heading);
+                  font-size: 1.3rem;
+                  font-weight: 500;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  opacity: 0;
+                  animation: taglineCycle var(--tagline-cycle) ease-in-out infinite;
+                }
+                
+                @keyframes taglineCycle {
+                  0%%   { opacity: 0; transform: translateY(100%%); }
+                  5%%   { opacity: 1; transform: translateY(0); }
+                  %s%%  { opacity: 1; transform: translateY(0); }
+                  %s%%  { opacity: 0; transform: translateY(-100%%); }
+                  100%% { opacity: 0; }
+                }
+                
+                /* ── Nav Buttons ─────────────────────────────────────────── */
+                
+                .nav-buttons {
+                  display: flex;
+                  justify-content: center;
+                  gap: 1rem;
+                  flex-wrap: wrap;
+                  margin-bottom: 3rem;
+                }
+                
+                .nav-btn {
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 0.75rem 2rem;
+                  background: var(--color-accent);
+                  color: #fff;
+                  font-family: var(--font-heading);
+                  font-size: 1rem;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  border-radius: var(--radius);
+                  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+                  box-shadow: var(--shadow);
+                }
+                .nav-btn:hover {
+                  background: var(--color-primary);
+                  color: #fff;
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+                }
+                
+                /* ── Home About Section ──────────────────────────────────── */
+                
+                .home-about {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 3rem;
+                  align-items: center;
+                  margin-bottom: 3rem;
+                  padding: 2rem 0;
+                }
+                
+                .home-about-text h2 {
+                  font-size: 1.75rem;
+                  margin-bottom: 1rem;
+                }
+                
+                .home-about-text p {
+                  line-height: 1.8;
+                  color: var(--color-text-muted);
+                  margin-bottom: 1.5rem;
+                  white-space: pre-wrap;
+                }
+                
+                .about-preview-img {
+                  border-radius: var(--radius);
+                  box-shadow: var(--shadow);
+                  width: 100%%;
+                  aspect-ratio: 4/3;
+                  object-fit: cover;
+                }
+                
+                /* ── Project Circles (Home) ──────────────────────────────── */
+                
+                .home-projects {
+                  margin-bottom: 3rem;
+                }
+                
+                .project-circles {
+                  display: flex;
+                  flex-wrap: wrap;
+                  justify-content: center;
+                  gap: 2.5rem;
+                  margin-top: 1.5rem;
+                }
+                
+                .project-circle-item {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 0.5rem;
+                  width: 140px;
+                  text-align: center;
+                }
+                
+                .project-circle-title {
+                  font-family: var(--font-heading);
+                  font-size: 0.9rem;
+                  font-weight: 600;
+                  color: var(--color-text);
+                }
+                
+                .project-circle-img-wrap {
+                  width: 120px;
+                  height: 120px;
+                  border-radius: 50%%;
+                  overflow: hidden;
+                  box-shadow: var(--shadow);
+                  border: 3px solid var(--color-border);
+                  transition: transform 0.2s, border-color 0.2s;
+                }
+                .project-circle-item:hover .project-circle-img-wrap {
+                  transform: scale(1.05);
+                  border-color: var(--color-primary);
+                }
+                
+                .project-circle-img-wrap img {
+                  width: 100%%;
+                  height: 100%%;
+                  object-fit: cover;
+                }
+                
+                .project-circle-subtitle {
+                  font-size: 0.8rem;
+                  color: var(--color-text-muted);
+                }
+                
+                /* ── Latest Comic (Home) ─────────────────────────────────── */
+                
+                .home-latest-comic {
+                  margin-bottom: 2rem;
                 }
                 
                 /* ── Cards & Grid ───────────────────────────────────────── */
@@ -489,6 +712,113 @@ public class SiteGeneratorService {
                   color: var(--color-text);
                 }
                 
+                .btn-lg {
+                  padding: 0.85rem 2rem;
+                  font-size: 1rem;
+                }
+                
+                /* ── Masonry Portfolio Grid ──────────────────────────────── */
+                
+                .masonry-grid {
+                  columns: 3;
+                  column-gap: 1rem;
+                }
+                
+                .masonry-item {
+                  display: inline-block;
+                  width: 100%%;
+                  margin-bottom: 1rem;
+                  break-inside: avoid;
+                  border-radius: var(--radius);
+                  overflow: hidden;
+                  background: var(--color-surface);
+                  box-shadow: var(--shadow);
+                  transition: transform 0.2s;
+                  cursor: pointer;
+                }
+                .masonry-item:hover {
+                  transform: scale(1.02);
+                }
+                
+                .masonry-item img {
+                  width: 100%%;
+                  display: block;
+                }
+                
+                .masonry-caption {
+                  padding: 0.6rem 0.8rem;
+                  font-size: 0.85rem;
+                  font-weight: 500;
+                }
+                
+                /* ── Commissions Page ────────────────────────────────────── */
+                
+                .commissions-container {
+                  max-width: 640px;
+                  margin: 0 auto;
+                }
+                
+                .commissions-container h1 {
+                  font-size: 2rem;
+                  margin-bottom: 0.75rem;
+                }
+                
+                .commissions-intro {
+                  color: var(--color-text-muted);
+                  margin-bottom: 2rem;
+                  line-height: 1.7;
+                }
+                
+                .commissions-form {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 1.25rem;
+                }
+                
+                .form-group {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 0.35rem;
+                }
+                
+                .form-group label {
+                  font-weight: 600;
+                  font-size: 0.9rem;
+                  color: var(--color-text);
+                }
+                
+                .form-group .optional {
+                  font-weight: 400;
+                  color: var(--color-text-muted);
+                  font-size: 0.8rem;
+                }
+                
+                .form-group input,
+                .form-group select,
+                .form-group textarea {
+                  padding: 0.65rem 0.85rem;
+                  border: 1px solid var(--color-border);
+                  border-radius: var(--radius);
+                  font-family: var(--font-body);
+                  font-size: 0.95rem;
+                  color: var(--color-text);
+                  background: var(--color-surface);
+                  transition: border-color 0.2s, box-shadow 0.2s;
+                }
+                
+                .form-group input:focus,
+                .form-group select:focus,
+                .form-group textarea:focus {
+                  outline: none;
+                  border-color: var(--color-primary);
+                  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+                }
+                
+                .form-group textarea {
+                  resize: vertical;
+                  min-height: 100px;
+                }
+                
                 /* ── Comic Reader ───────────────────────────────────────── */
                 
                 .reader-container {
@@ -557,39 +887,6 @@ public class SiteGeneratorService {
                   border-top: 1px solid var(--color-border);
                 }
                 
-                /* ── Thumbnail Grid ─────────────────────────────────────── */
-                
-                .thumbnail-grid {
-                  display: grid;
-                  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                  gap: 1rem;
-                }
-                
-                .thumbnail-item {
-                  position: relative;
-                  border-radius: var(--radius);
-                  overflow: hidden;
-                  cursor: pointer;
-                  background: var(--color-surface);
-                  box-shadow: var(--shadow);
-                  transition: transform 0.2s;
-                }
-                .thumbnail-item:hover {
-                  transform: scale(1.03);
-                }
-                
-                .thumbnail-item img {
-                  width: 100%%;
-                  aspect-ratio: 1;
-                  object-fit: cover;
-                }
-                
-                .thumbnail-caption {
-                  padding: 0.5rem 0.75rem;
-                  font-size: 0.85rem;
-                  font-weight: 500;
-                }
-                
                 /* ── PhotoSwipe Caption ─────────────────────────────────── */
                 
                 .pswp__custom-caption {
@@ -654,7 +951,7 @@ public class SiteGeneratorService {
                   border: none;
                   font-size: 1.5rem;
                   cursor: pointer;
-                  color: var(--color-text);
+                  color: #fff;
                 }
                 
                 @media (max-width: 768px) {
@@ -664,10 +961,9 @@ public class SiteGeneratorService {
                     top: 100%%;
                     left: 0;
                     right: 0;
-                    background: var(--color-surface);
+                    background: var(--color-primary);
                     flex-direction: column;
                     padding: 1rem;
-                    border-bottom: 2px solid var(--color-primary);
                     box-shadow: var(--shadow);
                   }
                   .site-nav.open {
@@ -676,14 +972,43 @@ public class SiteGeneratorService {
                   .hamburger {
                     display: block;
                   }
-                  .hero-overlay h1 {
-                    font-size: 1.75rem;
+                  .hero-title {
+                    font-size: 2.5rem;
                   }
                   .card-grid {
                     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
                   }
-                  .thumbnail-grid {
-                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                  .masonry-grid {
+                    columns: 2;
+                  }
+                  .home-about {
+                    grid-template-columns: 1fr;
+                  }
+                  .project-circles {
+                    gap: 1.5rem;
+                  }
+                  .project-circle-item {
+                    width: 110px;
+                  }
+                  .project-circle-img-wrap {
+                    width: 90px;
+                    height: 90px;
+                  }
+                  .nav-buttons {
+                    gap: 0.75rem;
+                  }
+                  .nav-btn {
+                    padding: 0.6rem 1.25rem;
+                    font-size: 0.9rem;
+                  }
+                }
+                
+                @media (max-width: 480px) {
+                  .masonry-grid {
+                    columns: 1;
+                  }
+                  .hero-title {
+                    font-size: 2rem;
                   }
                 }
                 """.formatted(
@@ -691,7 +1016,12 @@ public class SiteGeneratorService {
                 config.getSecondaryColor(),
                 config.getAccentColor(),
                 config.getHeadingFont(),
-                config.getBodyFont()
+                config.getBodyFont(),
+                taglineCount,
+                cycleDuration,
+                // Keyframe percentages: visible portion is ~30%% of each tagline's slot
+                String.format("%.0f", (1.0 / taglineCount) * 80),
+                String.format("%.0f", (1.0 / taglineCount) * 100)
         );
     }
 

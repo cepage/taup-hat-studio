@@ -43,6 +43,11 @@ public class SiteConfig {
     @Column(columnDefinition = "TEXT")
     private String socialLinks;
 
+    @Column(columnDefinition = "TEXT")
+    private String siteTaglines;
+
+    private String commissionsEmail;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -75,4 +80,10 @@ public class SiteConfig {
 
     public String getSocialLinks() { return socialLinks; }
     public void setSocialLinks(String socialLinks) { this.socialLinks = socialLinks; }
+
+    public String getSiteTaglines() { return siteTaglines; }
+    public void setSiteTaglines(String siteTaglines) { this.siteTaglines = siteTaglines; }
+
+    public String getCommissionsEmail() { return commissionsEmail; }
+    public void setCommissionsEmail(String commissionsEmail) { this.commissionsEmail = commissionsEmail; }
 }

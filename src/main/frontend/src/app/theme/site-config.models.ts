@@ -10,6 +10,8 @@ export interface SiteConfig {
   aboutText: string | null;
   bigcartelUrl: string | null;
   socialLinks: string | null;
+  siteTaglines: string | null;
+  commissionsEmail: string | null;
 }
 
 export interface SocialLink {

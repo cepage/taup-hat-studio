@@ -3,7 +3,8 @@
 <head th:replace="~{fragments/layout :: head('Portfolio')}">
   <title>Portfolio</title>
 </head>
-<body>
+<body class="page-fade-in">
+  <div th:replace="~{fragments/layout :: stars}"></div>
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
@@ -15,19 +16,19 @@
       <p>No artwork available yet. Check back soon!</p>
     </div>
 
-    <div class="thumbnail-grid pswp-gallery" id="portfolio-gallery">
-      <a class="thumbnail-item"
+    <div class="masonry-grid pswp-gallery" id="portfolio-gallery">
+      <a class="masonry-item"
          th:each="item, iter : ${portfolioItems}"
          th:href="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
          th:attr="data-pswp-width=${item.imageWidth != null ? item.imageWidth : 1200},
                   data-pswp-height=${item.imageHeight != null ? item.imageHeight : 900},
-                  data-pswp-caption=${item.title + (item.description != null ? ' &mdash; ' + item.description : '')},
-                  data-aos-delay=${iter.index * 100}"
+                  data-pswp-caption=${item.title + (item.description != null ? ' &mdash; ' + item.description : '')}"
          target="_blank"
-         data-aos="fade-up">
+         data-aos="fade-up"
+         th:data-aos-delay="${iter.index * 80}">
         <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
              th:alt="${item.title}">
-        <div class="thumbnail-caption" th:text="${item.title}">Item Title</div>
+        <div class="masonry-caption" th:text="${item.title}">Item Title</div>
       </a>
     </div>
   </main>

@@ -3,11 +3,12 @@
 <head th:replace="~{fragments/layout :: head('About')}">
   <title>About</title>
 </head>
-<body>
+<body class="page-fade-in">
+  <div th:replace="~{fragments/layout :: stars}"></div>
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
-    <div class="about-content">
+    <div class="about-content" data-aos="fade-up">
       <h1>About</h1>
 
       <div th:if="${config.aboutText != null and !config.aboutText.isEmpty()}" class="about-text"
@@ -21,7 +22,7 @@
       </div>
 
       <!-- Social links -->
-      <div th:if="${!socialLinks.isEmpty()}" class="social-links" style="margin-top: 2rem;">
+      <div th:if="${!socialLinks.isEmpty()}" class="social-links">
         <a th:each="link : ${socialLinks}"
            th:href="${link.get('url')}"
            class="social-link"
