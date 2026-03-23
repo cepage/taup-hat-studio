@@ -1,5 +1,6 @@
 package org.tanzu.thstudio.portfolio;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class PortfolioSet {
     @Column(nullable = false)
     private Integer sortOrder = 0;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "set")
     @OrderBy("setSortOrder ASC")
     private List<PortfolioItem> items = new ArrayList<>();

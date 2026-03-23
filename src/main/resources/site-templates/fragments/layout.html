@@ -9,6 +9,7 @@
   <meta name="generator" content="TaupHat Studio">
   <title th:text="${pageTitle} + ' — ' + ${siteName}" />
   <link rel="stylesheet" href="/css/style.css">
+  <link th:if="${adobeFontsUrl != null and !adobeFontsUrl.isEmpty()}" rel="stylesheet" th:href="${adobeFontsUrl}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
 </head>

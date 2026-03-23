@@ -162,6 +162,50 @@ mat-card {
 
 // ── Typography ──────────────────────────────────────────────────────────────
 
+.adobe-fonts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-lowest);
+
+  > .section-label {
+    font: var(--mat-sys-label-large);
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+.detected-font-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .detected-label {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+    margin-bottom: 4px;
+  }
+}
+
+.font-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.font-error {
+  color: var(--mat-sys-error);
+}
+
+.font-hint,
+.font-loading,
+.font-error {
+  font: var(--mat-sys-body-medium);
+}
+
 .font-preview {
   margin-top: 8px;
 }

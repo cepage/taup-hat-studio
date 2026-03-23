@@ -271,6 +271,7 @@ public class SiteGeneratorService {
         var ctx = new Context();
         ctx.setVariable("config", config);
         ctx.setVariable("siteName", config.getSiteName());
+        ctx.setVariable("adobeFontsUrl", config.getAdobeFontsUrl());
         ctx.setVariable("year", LocalDateTime.now().getYear());
         ctx.setVariable("generatedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         return ctx;
@@ -302,7 +303,8 @@ public class SiteGeneratorService {
      * Generates the main stylesheet from the site configuration theme values.
      */
     private String generateStyleCss(SiteConfig config) {
-        var googleFontsImport = buildGoogleFontsImport(config.getHeadingFont(), config.getBodyFont());
+        var customFontNames = parseCustomFonts(config.getCustomFonts());
+        var googleFontsImport = buildGoogleFontsImport(config.getHeadingFont(), config.getBodyFont(), customFontNames);
 
         var taglines = parseTaglines(config.getSiteTaglines());
         int taglineCount = Math.max(taglines.size(), 1);
@@ -1255,13 +1257,39 @@ public class SiteGeneratorService {
         );
     }
 
-    private String buildGoogleFontsImport(String headingFont, String bodyFont) {
-        var heading = headingFont.replace(" ", "+");
-        var body = bodyFont.replace(" ", "+");
-        if (heading.equals(body)) {
-            return "@import url('https://fonts.googleapis.com/css2?family=" + heading + ":wght@400;600;700&display=swap');\n";
+    private String buildGoogleFontsImport(String headingFont, String bodyFont, List<String> customFontNames) {
+        boolean headingIsCustom = customFontNames.contains(headingFont);
+        boolean bodyIsCustom = customFontNames.contains(bodyFont);
+
+        if (headingIsCustom && bodyIsCustom) {
+            return "";
         }
-        return "@import url('https://fonts.googleapis.com/css2?family=" + heading + ":wght@400;600;700&family=" + body + ":wght@400;500;600&display=swap');\n";
+
+        var families = new ArrayList<String>();
+        if (!headingIsCustom) {
+            families.add(headingFont.replace(" ", "+") + ":wght@400;600;700");
+        }
+        if (!bodyIsCustom && !bodyFont.equals(headingFont)) {
+            families.add(bodyFont.replace(" ", "+") + ":wght@400;500;600");
+        }
+
+        if (families.isEmpty()) {
+            return "";
+        }
+
+        return "@import url('https://fonts.googleapis.com/css2?family=" + String.join("&family=", families) + "&display=swap');\n";
+    }
+
+    private List<String> parseCustomFonts(String json) {
+        if (json == null || json.isBlank()) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (Exception e) {
+            log.warn("Failed to parse custom fonts JSON: {}", e.getMessage());
+            return List.of();
+        }
     }
 
     private String loadStaticAsset(String classpath) {

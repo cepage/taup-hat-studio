@@ -150,14 +150,65 @@
       <mat-card-header>
         <mat-icon mat-card-avatar>text_fields</mat-icon>
         <mat-card-title>Typography</mat-card-title>
-        <mat-card-subtitle>Select Google Fonts for your site</mat-card-subtitle>
+        <mat-card-subtitle>Select fonts for your site</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
+        <!-- Adobe Fonts Section -->
+        <div class="adobe-fonts-section">
+          <span class="section-label">Adobe Fonts (Typekit)</span>
+          <mat-form-field appearance="outline">
+            <mat-label>Adobe Fonts CSS URL</mat-label>
+            <input
+              matInput
+              [(ngModel)]="cfg.adobeFontsUrl"
+              (ngModelChange)="onAdobeFontsUrlChange($event)"
+              placeholder="https://use.typekit.net/abc1def.css"
+            />
+            <mat-icon matPrefix>link</mat-icon>
+            <mat-hint>Paste the CSS URL from your Adobe Fonts web project</mat-hint>
+          </mat-form-field>
+
+          @if (loadingFonts()) {
+            <div class="font-loading">
+              <mat-spinner diameter="20" />
+              <span>Detecting fonts...</span>
+            </div>
+          } @else if (fontLoadError()) {
+            <span class="font-error">Could not load fonts from this URL.</span>
+          } @else if (availableFonts().length > 0) {
+            <div class="detected-font-list">
+              <span class="detected-label">Available fonts — select to enable:</span>
+              @for (font of availableFonts(); track font) {
+                <mat-checkbox
+                  [checked]="isFontSelected(font)"
+                  (change)="toggleFont(font)"
+                >
+                  {{ font }}
+                </mat-checkbox>
+              }
+            </div>
+          } @else if (!cfg.adobeFontsUrl) {
+            <span class="font-hint">Paste a Typekit CSS URL above to detect available fonts.</span>
+          }
+        </div>
+
+        <!-- Font Selects -->
         <mat-form-field appearance="outline">
           <mat-label>Heading Font</mat-label>
           <mat-select [(ngModel)]="cfg.headingFont">
-            @for (font of headingFonts; track font) {
-              <mat-option [value]="font">{{ font }}</mat-option>
+            <mat-optgroup label="Google Fonts">
+              @for (font of googleHeadingFonts; track font) {
+                <mat-option [value]="font">{{ font }}</mat-option>
+              }
+            </mat-optgroup>
+            @if (customFontNames().length > 0) {
+              <mat-optgroup label="Custom Fonts">
+                @for (font of customFontNames(); track $index) {
+                  @if (font.trim()) {
+                    <mat-option [value]="font">{{ font }}</mat-option>
+                  }
+                }
+              </mat-optgroup>
             }
           </mat-select>
           <mat-hint>Used for page titles, section headings, and the site name</mat-hint>
@@ -166,8 +217,19 @@
         <mat-form-field appearance="outline">
           <mat-label>Body Font</mat-label>
           <mat-select [(ngModel)]="cfg.bodyFont">
-            @for (font of bodyFonts; track font) {
-              <mat-option [value]="font">{{ font }}</mat-option>
+            <mat-optgroup label="Google Fonts">
+              @for (font of googleBodyFonts; track font) {
+                <mat-option [value]="font">{{ font }}</mat-option>
+              }
+            </mat-optgroup>
+            @if (customFontNames().length > 0) {
+              <mat-optgroup label="Custom Fonts">
+                @for (font of customFontNames(); track $index) {
+                  @if (font.trim()) {
+                    <mat-option [value]="font">{{ font }}</mat-option>
+                  }
+                }
+              </mat-optgroup>
             }
           </mat-select>
           <mat-hint>Used for paragraphs, descriptions, and general text</mat-hint>

@@ -12,6 +12,8 @@ export interface SiteConfig {
   socialLinks: string | null;
   siteTaglines: string | null;
   commissionsEmail: string | null;
+  adobeFontsUrl: string | null;
+  customFonts: string | null;
 }
 
 export interface SocialLink {

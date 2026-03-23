@@ -48,6 +48,12 @@ public class SiteConfig {
 
     private String commissionsEmail;
 
+    @Column(length = 1024)
+    private String adobeFontsUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String customFonts;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -86,4 +92,10 @@ public class SiteConfig {
 
     public String getCommissionsEmail() { return commissionsEmail; }
     public void setCommissionsEmail(String commissionsEmail) { this.commissionsEmail = commissionsEmail; }
+
+    public String getAdobeFontsUrl() { return adobeFontsUrl; }
+    public void setAdobeFontsUrl(String adobeFontsUrl) { this.adobeFontsUrl = adobeFontsUrl; }
+
+    public String getCustomFonts() { return customFonts; }
+    public void setCustomFonts(String customFonts) { this.customFonts = customFonts; }
 }
