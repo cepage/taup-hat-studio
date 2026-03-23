@@ -9,4 +9,8 @@ public interface PortfolioItemRepository extends JpaRepository<PortfolioItem, Lo
     List<PortfolioItem> findAllByOrderBySortOrderAsc();
 
     List<PortfolioItem> findByCategoryOrderBySortOrderAsc(String category);
+
+    List<PortfolioItem> findBySetIdOrderBySetSortOrderAsc(Long setId);
+
+    List<PortfolioItem> findBySetIdIsNullOrderBySortOrderAsc();
 }

@@ -22,6 +22,11 @@
   }
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .loading {
   display: flex;
   align-items: center;
@@ -60,6 +65,16 @@
       opacity: 1;
     }
   }
+
+  &.set-card {
+    border-color: var(--mat-sys-primary);
+    border-width: 2px;
+
+    &.expanded {
+      width: 100%;
+      flex-basis: 100%;
+    }
+  }
 }
 
 .card-image {
@@ -68,6 +83,7 @@
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--mat-sys-surface-container);
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -107,6 +123,26 @@
   }
 }
 
+.set-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  border-radius: 16px;
+  padding: 4px 10px 4px 6px;
+  font: var(--mat-sys-label-small);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .card-content {
   padding: 12px 12px 4px;
 
@@ -137,12 +173,73 @@
 .card-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 4px 4px;
 }
 
-.reorder-actions,
 .item-actions {
+  display: flex;
+  align-items: center;
+}
+
+// ── Set Expanded Panel ──
+
+.set-items-panel {
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  padding: 12px;
+}
+
+.set-items-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  .set-items-label {
+    font: var(--mat-sys-title-small);
+    flex: 1;
+  }
+}
+
+.set-items-empty {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.set-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.set-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.set-item-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.set-item-title {
+  flex: 1;
+  font: var(--mat-sys-body-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.set-item-actions {
   display: flex;
   align-items: center;
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tanzu.thstudio.portfolio.PortfolioItem;
 import org.tanzu.thstudio.portfolio.PortfolioItemRepository;
+import org.tanzu.thstudio.portfolio.PortfolioSet;
+import org.tanzu.thstudio.portfolio.PortfolioSetRepository;
 import org.tanzu.thstudio.site.SiteConfig;
 import org.tanzu.thstudio.site.SiteConfigService;
 import org.tanzu.thstudio.webcomic.WebcomicIssue;
@@ -25,7 +27,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class SiteGeneratorService {
     private final WebcomicIssueRepository issueRepository;
     private final WebcomicPageRepository pageRepository;
     private final PortfolioItemRepository portfolioRepository;
+    private final PortfolioSetRepository portfolioSetRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SiteGeneratorService(
@@ -58,13 +63,15 @@ public class SiteGeneratorService {
             WebcomicSeriesRepository seriesRepository,
             WebcomicIssueRepository issueRepository,
             WebcomicPageRepository pageRepository,
-            PortfolioItemRepository portfolioRepository) {
+            PortfolioItemRepository portfolioRepository,
+            PortfolioSetRepository portfolioSetRepository) {
         this.templateEngine = templateEngine;
         this.siteConfigService = siteConfigService;
         this.seriesRepository = seriesRepository;
         this.issueRepository = issueRepository;
         this.pageRepository = pageRepository;
         this.portfolioRepository = portfolioRepository;
+        this.portfolioSetRepository = portfolioSetRepository;
     }
 
     /**
@@ -77,6 +84,7 @@ public class SiteGeneratorService {
         var config = siteConfigService.getConfig();
         var activeSeries = seriesRepository.findByActiveTrueOrderBySortOrderAsc();
         var portfolioItems = portfolioRepository.findAllByOrderBySortOrderAsc();
+        var portfolioSets = portfolioSetRepository.findAllByOrderBySortOrderAsc();
 
         // Generate CSS from theme config
         site.addCss("css/style.css", generateStyleCss(config));
@@ -85,6 +93,7 @@ public class SiteGeneratorService {
         site.addJs("js/comic-reader.js", loadStaticAsset("site-assets/comic-reader.js"));
         site.addJs("js/portfolio-lightbox.js", loadStaticAsset("site-assets/portfolio-lightbox.js"));
         site.addJs("js/stars.js", loadStaticAsset("site-assets/stars.js"));
+        site.addJs("js/set-viewer.js", loadStaticAsset("site-assets/set-viewer.js"));
 
         // Home page
         site.addHtml("index.html", renderHome(config, activeSeries, portfolioItems));
@@ -105,8 +114,16 @@ public class SiteGeneratorService {
             }
         }
 
-        // Portfolio page
-        site.addHtml("portfolio/index.html", renderPortfolio(config, portfolioItems));
+        // Portfolio page (interleaved standalone items + sets)
+        var standaloneItems = portfolioItems.stream().filter(i -> i.getSetId() == null).toList();
+        site.addHtml("portfolio/index.html", renderPortfolio(config, standaloneItems, portfolioSets));
+
+        // Portfolio set viewer pages
+        for (var set : portfolioSets) {
+            var setItems = portfolioRepository.findBySetIdOrderBySetSortOrderAsc(set.getId());
+            site.addHtml("portfolio/sets/" + set.getId() + "/index.html",
+                    renderPortfolioSet(config, set, setItems));
+        }
 
         // Commissions page
         site.addHtml("commissions/index.html", renderCommissions(config));
@@ -196,10 +213,44 @@ public class SiteGeneratorService {
         return templateEngine.process("issue-reader", ctx);
     }
 
-    private String renderPortfolio(SiteConfig config, List<PortfolioItem> items) {
+    private String renderPortfolio(SiteConfig config, List<PortfolioItem> standaloneItems,
+                                    List<PortfolioSet> sets) {
         var ctx = baseContext(config);
-        ctx.setVariable("portfolioItems", items);
+
+        // Build an interleaved list of entries for the template
+        record PortfolioEntry(String type, int sortOrder, PortfolioItem item, PortfolioSet set, int itemCount) {}
+
+        var entries = new ArrayList<PortfolioEntry>();
+        for (var item : standaloneItems) {
+            entries.add(new PortfolioEntry("item", item.getSortOrder(), item, null, 0));
+        }
+        for (var set : sets) {
+            int count = portfolioRepository.findBySetIdOrderBySetSortOrderAsc(set.getId()).size();
+            entries.add(new PortfolioEntry("set", set.getSortOrder(), null, set, count));
+        }
+        entries.sort(Comparator.comparingInt(PortfolioEntry::sortOrder));
+
+        ctx.setVariable("entries", entries);
         return templateEngine.process("portfolio", ctx);
+    }
+
+    private String renderPortfolioSet(SiteConfig config, PortfolioSet set, List<PortfolioItem> items) {
+        var ctx = baseContext(config);
+        ctx.setVariable("set", set);
+        ctx.setVariable("items", items);
+
+        var itemsJson = items.stream().map(item -> {
+            var map = new LinkedHashMap<String, Object>();
+            map.put("id", item.getId());
+            map.put("title", item.getTitle());
+            map.put("imageUrl", item.getImageUrl());
+            map.put("optimizedUrl", item.getOptimizedUrl());
+            map.put("thumbnailUrl", item.getThumbnailUrl());
+            return map;
+        }).toList();
+        ctx.setVariable("itemsJson", itemsJson);
+
+        return templateEngine.process("portfolio-set", ctx);
     }
 
     private String renderAbout(SiteConfig config) {
@@ -337,8 +388,11 @@ public class SiteGeneratorService {
                 /* ── Star Decorations ───────────────────────────────────── */
                 
                 .stars-container {
-                  position: fixed;
-                  inset: 0;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%%;
+                  height: 100%%;
                   pointer-events: none;
                   z-index: 0;
                   overflow: hidden;
@@ -349,7 +403,7 @@ public class SiteGeneratorService {
                   color: var(--color-primary);
                   opacity: 0;
                   animation: starTwinkle 4s ease-in-out infinite alternate;
-                  transition: opacity 0.6s ease;
+                  transition: opacity 0.5s ease;
                 }
                 
                 @keyframes starTwinkle {
@@ -946,6 +1000,164 @@ public class SiteGeneratorService {
                   background: var(--color-bg);
                 }
                 
+                /* ── Portfolio Set Badge (on grid card) ─────────────────── */
+                
+                .set-card-link {
+                  text-decoration: none;
+                  color: inherit;
+                }
+                
+                .set-card-image-wrap {
+                  position: relative;
+                }
+                
+                .set-badge-overlay {
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  background: var(--color-primary);
+                  color: #fff;
+                  border-radius: 14px;
+                  padding: 4px 10px 4px 8px;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                }
+                
+                .set-badge-overlay svg {
+                  flex-shrink: 0;
+                }
+                
+                /* ── Set Viewer Page ────────────────────────────────────── */
+                
+                .set-viewer-main {
+                  max-width: 100%%;
+                  padding: 1rem 1.5rem;
+                }
+                
+                .set-viewer-header {
+                  max-width: var(--max-width);
+                  margin: 0 auto 1.5rem;
+                }
+                
+                .set-back-link {
+                  font-size: 0.9rem;
+                  font-weight: 500;
+                  display: inline-block;
+                  margin-bottom: 0.5rem;
+                }
+                
+                .set-viewer-header h1 {
+                  font-size: 2rem;
+                  margin-bottom: 0.25rem;
+                }
+                
+                .set-description {
+                  color: var(--color-text-muted);
+                  line-height: 1.6;
+                }
+                
+                .set-viewer-container {
+                  display: flex;
+                  gap: 1rem;
+                  max-width: 1400px;
+                  margin: 0 auto;
+                }
+                
+                .set-viewer-sidebar {
+                  width: 120px;
+                  flex-shrink: 0;
+                  position: sticky;
+                  top: 80px;
+                  max-height: calc(100vh - 100px);
+                  overflow-y: auto;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                  padding: 4px;
+                  scrollbar-width: thin;
+                }
+                
+                .sidebar-thumb {
+                  position: relative;
+                  cursor: pointer;
+                  border-radius: 6px;
+                  overflow: hidden;
+                  border: 2px solid transparent;
+                  transition: border-color 0.2s, box-shadow 0.2s;
+                  flex-shrink: 0;
+                }
+                
+                .sidebar-thumb:hover {
+                  border-color: var(--color-secondary);
+                }
+                
+                .sidebar-thumb.active {
+                  border-color: var(--color-primary);
+                  box-shadow: 0 0 0 2px var(--color-primary);
+                }
+                
+                .sidebar-thumb img {
+                  width: 100%%;
+                  aspect-ratio: 3/4;
+                  object-fit: cover;
+                  display: block;
+                }
+                
+                .thumb-number {
+                  position: absolute;
+                  top: 4px;
+                  left: 4px;
+                  background: rgba(0,0,0,0.55);
+                  color: #fff;
+                  font-size: 0.7rem;
+                  font-weight: 600;
+                  width: 20px;
+                  height: 20px;
+                  border-radius: 50%%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                
+                .set-viewer-content {
+                  flex: 1;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 2rem;
+                  min-width: 0;
+                }
+                
+                .set-viewer-item {
+                  background: var(--color-surface);
+                  border-radius: var(--radius);
+                  overflow: hidden;
+                  box-shadow: var(--shadow);
+                }
+                
+                .set-viewer-item img {
+                  width: 100%%;
+                  display: block;
+                }
+                
+                .set-viewer-item-info {
+                  padding: 1rem 1.25rem;
+                }
+                
+                .set-viewer-item-info h3 {
+                  font-size: 1.1rem;
+                  margin-bottom: 0.25rem;
+                }
+                
+                .set-viewer-item-info p {
+                  color: var(--color-text-muted);
+                  font-size: 0.9rem;
+                  line-height: 1.6;
+                }
+                
                 /* ── Responsive ─────────────────────────────────────────── */
                 
                 .hamburger {
@@ -1003,6 +1215,21 @@ public class SiteGeneratorService {
                   .nav-btn {
                     padding: 0.6rem 1.25rem;
                     font-size: 0.9rem;
+                  }
+                  .set-viewer-container {
+                    flex-direction: column;
+                  }
+                  .set-viewer-sidebar {
+                    width: 100%%;
+                    position: static;
+                    max-height: 120px;
+                    flex-direction: row;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                  }
+                  .sidebar-thumb {
+                    width: 80px;
+                    flex-shrink: 0;
                   }
                 }
                 

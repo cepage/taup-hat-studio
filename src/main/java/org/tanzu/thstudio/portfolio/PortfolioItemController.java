@@ -24,13 +24,16 @@ import java.util.List;
 public class PortfolioItemController {
 
     private final PortfolioItemRepository portfolioRepository;
+    private final PortfolioSetRepository setRepository;
     private final ImageProcessingService imageProcessingService;
     private final StorageService storageService;
 
     public PortfolioItemController(PortfolioItemRepository portfolioRepository,
+                                   PortfolioSetRepository setRepository,
                                    ImageProcessingService imageProcessingService,
                                    StorageService storageService) {
         this.portfolioRepository = portfolioRepository;
+        this.setRepository = setRepository;
         this.imageProcessingService = imageProcessingService;
         this.storageService = storageService;
     }
@@ -51,7 +54,8 @@ public class PortfolioItemController {
     public ResponseEntity<PortfolioItem> create(@RequestParam("file") MultipartFile file,
                                                 @RequestParam("title") String title,
                                                 @RequestParam(value = "description", required = false) String description,
-                                                @RequestParam(value = "category", required = false) String category)
+                                                @RequestParam(value = "category", required = false) String category,
+                                                @RequestParam(value = "setId", required = false) Long setId)
             throws IOException {
 
         // Determine next sort order
@@ -74,6 +78,14 @@ public class PortfolioItemController {
         item.setOptimizedUrl(urls.optimizedUrl());
         item.setImageWidth(urls.width());
         item.setImageHeight(urls.height());
+
+        if (setId != null) {
+            setRepository.findById(setId).ifPresent(set -> {
+                item.setSet(set);
+                var setItems = portfolioRepository.findBySetIdOrderBySetSortOrderAsc(setId);
+                item.setSetSortOrder(setItems.isEmpty() ? 0 : setItems.getLast().getSetSortOrder() + 1);
+            });
+        }
 
         var saved = portfolioRepository.save(item);
         return ResponseEntity

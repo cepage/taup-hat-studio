@@ -3,8 +3,7 @@
 <head th:replace="~{fragments/layout :: head('Portfolio')}">
   <title>Portfolio</title>
 </head>
-<body class="page-fade-in">
-  <div th:replace="~{fragments/layout :: stars}"></div>
+<body>
   <header th:replace="~{fragments/layout :: header}"></header>
 
   <main class="site-main">
@@ -12,24 +11,46 @@
       <h2>Portfolio</h2>
     </div>
 
-    <div th:if="${portfolioItems.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+    <div th:if="${entries.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
       <p>No artwork available yet. Check back soon!</p>
     </div>
 
     <div class="masonry-grid pswp-gallery" id="portfolio-gallery">
-      <a class="masonry-item"
-         th:each="item, iter : ${portfolioItems}"
-         th:href="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
-         th:attr="data-pswp-width=${item.imageWidth != null ? item.imageWidth : 1200},
-                  data-pswp-height=${item.imageHeight != null ? item.imageHeight : 900},
-                  data-pswp-caption=${item.title + (item.description != null ? ' &mdash; ' + item.description : '')}"
-         target="_blank"
-         data-aos="fade-up"
-         th:data-aos-delay="${iter.index * 80}">
-        <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
-             th:alt="${item.title}">
-        <div class="masonry-caption" th:text="${item.title}">Item Title</div>
-      </a>
+      <th:block th:each="entry, iter : ${entries}">
+        <!-- Standalone item -->
+        <a class="masonry-item"
+           th:if="${entry.type() == 'item'}"
+           th:href="${entry.item().optimizedUrl != null ? entry.item().optimizedUrl : entry.item().imageUrl}"
+           th:attr="data-pswp-width=${entry.item().imageWidth != null ? entry.item().imageWidth : 1200},
+                    data-pswp-height=${entry.item().imageHeight != null ? entry.item().imageHeight : 900},
+                    data-pswp-caption=${entry.item().title + (entry.item().description != null ? ' &mdash; ' + entry.item().description : '')},
+                    data-aos-delay=${iter.index * 100}"
+           target="_blank"
+           data-aos="fade-up">
+          <img th:src="${entry.item().thumbnailUrl != null ? entry.item().thumbnailUrl : entry.item().imageUrl}"
+               th:alt="${entry.item().title}">
+          <div class="masonry-caption" th:text="${entry.item().title}">Item Title</div>
+        </a>
+
+        <!-- Portfolio set -->
+        <a class="masonry-item set-card-link"
+           th:if="${entry.type() == 'set'}"
+           th:href="'/portfolio/sets/' + ${entry.set().id} + '/'"
+           th:attr="data-aos-delay=${iter.index * 100}"
+           data-aos="fade-up">
+          <div class="set-card-image-wrap">
+            <img th:src="${entry.set().iconThumbnailUrl != null ? entry.set().iconThumbnailUrl : entry.set().iconImageUrl}"
+                 th:alt="${entry.set().title}">
+            <div class="set-badge-overlay">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4 2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/>
+              </svg>
+              <span th:text="${entry.itemCount()}">0</span>
+            </div>
+          </div>
+          <div class="masonry-caption" th:text="${entry.set().title}">Set Title</div>
+        </a>
+      </th:block>
     </div>
   </main>
 

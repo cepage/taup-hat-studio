@@ -3,10 +3,16 @@
     <h1>Portfolio</h1>
     <p class="subtitle">Manage your artwork portfolio.</p>
   </div>
-  <button mat-fab extended (click)="createItem()">
-    <mat-icon>add</mat-icon>
-    New Item
-  </button>
+  <div class="header-actions">
+    <button mat-fab extended (click)="createSet()">
+      <mat-icon>collections</mat-icon>
+      New Set
+    </button>
+    <button mat-fab extended (click)="createItem()">
+      <mat-icon>add</mat-icon>
+      New Item
+    </button>
+  </div>
 </div>
 
 <input
@@ -15,6 +21,13 @@
   accept="image/*"
   hidden
   (change)="onImageSelected($event)"
+/>
+<input
+  #iconInput
+  type="file"
+  accept="image/*"
+  hidden
+  (change)="onIconSelected($event)"
 />
 
 @if (uploading()) {
@@ -27,8 +40,8 @@
     <mat-spinner diameter="40" />
     <span>Loading portfolio...</span>
   </div>
-} @else if (items().length === 0) {
-  <app-empty-state icon="palette" title="No portfolio items yet" description="Add artwork to your portfolio to get started.">
+} @else if (gridEntries().length === 0) {
+  <app-empty-state icon="palette" title="No portfolio items yet" description="Add artwork or create a set to get started.">
     <button mat-flat-button (click)="createItem()" actions>
       <mat-icon>add</mat-icon>
       Add Artwork
@@ -36,63 +49,170 @@
   </app-empty-state>
 } @else {
   <div class="portfolio-grid">
-    @for (item of items(); track item.id) {
-      <div class="portfolio-card">
-        <div class="card-image">
-          @if (item.thumbnailUrl || item.optimizedUrl || item.imageUrl) {
-            <img
-              [src]="item.thumbnailUrl || item.optimizedUrl || item.imageUrl"
-              [alt]="item.title"
-            />
-          } @else {
-            <div class="placeholder-image">
-              <mat-icon>image</mat-icon>
+    @for (entry of gridEntries(); track entry.kind === 'item' ? 'i-' + entry.item.id : 's-' + entry.set.id) {
+      @if (entry.kind === 'item') {
+        <!-- Standalone Item Card -->
+        <div class="portfolio-card">
+          <div class="card-image">
+            @if (entry.item.thumbnailUrl || entry.item.optimizedUrl || entry.item.imageUrl) {
+              <img
+                [src]="entry.item.thumbnailUrl || entry.item.optimizedUrl || entry.item.imageUrl"
+                [alt]="entry.item.title"
+              />
+            } @else {
+              <div class="placeholder-image">
+                <mat-icon>image</mat-icon>
+              </div>
+            }
+            <div class="image-overlay">
+              <button
+                mat-icon-button
+                (click)="triggerReplaceImage(entry.item)"
+                aria-label="Replace image"
+              >
+                <mat-icon>photo_camera</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="item-title">{{ entry.item.title }}</h3>
+            @if (entry.item.category) {
+              <mat-chip-set aria-label="Category">
+                <mat-chip>{{ entry.item.category }}</mat-chip>
+              </mat-chip-set>
+            }
+            @if (entry.item.description) {
+              <p class="item-description">{{ entry.item.description }}</p>
+            }
+          </div>
+          <div class="card-actions">
+            <div class="item-actions">
+              <button mat-icon-button (click)="editItem(entry.item)" aria-label="Edit item">
+                <mat-icon>edit</mat-icon>
+              </button>
+              @if (sets().length > 0) {
+                <button mat-icon-button [matMenuTriggerFor]="addToSetMenu" aria-label="Add to set">
+                  <mat-icon>playlist_add</mat-icon>
+                </button>
+                <mat-menu #addToSetMenu="matMenu">
+                  @for (set of sets(); track set.id) {
+                    <button mat-menu-item (click)="addItemToSet(entry.item, set)">
+                      {{ set.title }}
+                    </button>
+                  }
+                </mat-menu>
+              }
+              <button mat-icon-button color="warn" (click)="confirmDeleteItem(entry.item)" aria-label="Delete item">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <!-- Set Card -->
+        <div class="portfolio-card set-card" [class.expanded]="expandedSetId() === entry.set.id">
+          <div class="card-image" (click)="toggleSetExpanded(entry.set)">
+            @if (entry.set.iconThumbnailUrl || entry.set.iconOptimizedUrl || entry.set.iconImageUrl) {
+              <img
+                [src]="entry.set.iconThumbnailUrl || entry.set.iconOptimizedUrl || entry.set.iconImageUrl"
+                [alt]="entry.set.title"
+              />
+            } @else {
+              <div class="placeholder-image">
+                <mat-icon>collections</mat-icon>
+              </div>
+            }
+            <div class="set-badge">
+              <mat-icon>collections</mat-icon>
+              <span>{{ getSetItems(entry.set).length }}</span>
+            </div>
+            <div class="image-overlay">
+              <button
+                mat-icon-button
+                (click)="triggerReplaceIcon(entry.set); $event.stopPropagation()"
+                aria-label="Replace icon"
+              >
+                <mat-icon>photo_camera</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="card-content" (click)="toggleSetExpanded(entry.set)">
+            <h3 class="item-title">{{ entry.set.title }}</h3>
+            @if (entry.set.description) {
+              <p class="item-description">{{ entry.set.description }}</p>
+            }
+          </div>
+          <div class="card-actions">
+            <div class="item-actions">
+              <button mat-icon-button (click)="toggleSetExpanded(entry.set)" aria-label="Expand set">
+                <mat-icon>{{ expandedSetId() === entry.set.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editSet(entry.set)" aria-label="Edit set">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="confirmDeleteSet(entry.set)" aria-label="Delete set">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          @if (expandedSetId() === entry.set.id) {
+            <div class="set-items-panel">
+              <div class="set-items-header">
+                <span class="set-items-label">Items in set</span>
+                <button mat-button (click)="createItemInSet(entry.set)">
+                  <mat-icon>add</mat-icon>
+                  Add New
+                </button>
+                @if (getAvailableItemsForSet(entry.set).length > 0) {
+                  <button mat-button [matMenuTriggerFor]="addExistingMenu">
+                    <mat-icon>playlist_add</mat-icon>
+                    Add Existing
+                  </button>
+                  <mat-menu #addExistingMenu="matMenu">
+                    @for (availableItem of getAvailableItemsForSet(entry.set); track availableItem.id) {
+                      <button mat-menu-item (click)="addItemToSet(availableItem, entry.set)">
+                        {{ availableItem.title }}
+                      </button>
+                    }
+                  </mat-menu>
+                }
+              </div>
+              @if (getSetItems(entry.set).length === 0) {
+                <p class="set-items-empty">No items in this set yet.</p>
+              } @else {
+                <div class="set-items-list">
+                  @for (setItem of getSetItems(entry.set); track setItem.id; let idx = $index; let first = $first; let last = $last) {
+                    <div class="set-item-row">
+                      <img
+                        class="set-item-thumb"
+                        [src]="setItem.thumbnailUrl || setItem.optimizedUrl || setItem.imageUrl"
+                        [alt]="setItem.title"
+                      />
+                      <span class="set-item-title">{{ setItem.title }}</span>
+                      <div class="set-item-actions">
+                        @if (!first) {
+                          <button mat-icon-button (click)="moveSetItem(entry.set, idx, -1)" aria-label="Move up">
+                            <mat-icon>arrow_upward</mat-icon>
+                          </button>
+                        }
+                        @if (!last) {
+                          <button mat-icon-button (click)="moveSetItem(entry.set, idx, 1)" aria-label="Move down">
+                            <mat-icon>arrow_downward</mat-icon>
+                          </button>
+                        }
+                        <button mat-icon-button (click)="removeItemFromSet(setItem, entry.set)" aria-label="Remove from set">
+                          <mat-icon>remove_circle_outline</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           }
-          <div class="image-overlay">
-            <button
-              mat-icon-button
-              (click)="triggerReplaceImage(item)"
-              aria-label="Replace image"
-            >
-              <mat-icon>photo_camera</mat-icon>
-            </button>
-          </div>
         </div>
-        <div class="card-content">
-          <h3 class="item-title">{{ item.title }}</h3>
-          @if (item.category) {
-            <mat-chip-set aria-label="Category">
-              <mat-chip>{{ item.category }}</mat-chip>
-            </mat-chip-set>
-          }
-          @if (item.description) {
-            <p class="item-description">{{ item.description }}</p>
-          }
-        </div>
-        <div class="card-actions">
-          <div class="reorder-actions">
-            @if (!$first) {
-              <button mat-icon-button (click)="moveItem($index, -1)" aria-label="Move item left">
-                <mat-icon>chevron_left</mat-icon>
-              </button>
-            }
-            @if (!$last) {
-              <button mat-icon-button (click)="moveItem($index, 1)" aria-label="Move item right">
-                <mat-icon>chevron_right</mat-icon>
-              </button>
-            }
-          </div>
-          <div class="item-actions">
-            <button mat-icon-button (click)="editItem(item)" aria-label="Edit item">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="confirmDeleteItem(item)" aria-label="Delete item">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
+      }
     }
   </div>
 }

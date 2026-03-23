@@ -1,10 +1,14 @@
 package org.tanzu.thstudio.portfolio;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -37,6 +41,17 @@ public class PortfolioItem {
     @Column(nullable = false)
     private Integer sortOrder = 0;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "set_id")
+    @JsonIgnore
+    private PortfolioSet set;
+
+    @Column(name = "set_id", insertable = false, updatable = false)
+    private Long setId;
+
+    @Column(nullable = false)
+    private Integer setSortOrder = 0;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -66,4 +81,12 @@ public class PortfolioItem {
 
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+
+    public PortfolioSet getSet() { return set; }
+    public void setSet(PortfolioSet set) { this.set = set; }
+
+    public Long getSetId() { return setId; }
+
+    public Integer getSetSortOrder() { return setSortOrder; }
+    public void setSetSortOrder(Integer setSortOrder) { this.setSortOrder = setSortOrder; }
 }

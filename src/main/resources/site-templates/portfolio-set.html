@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${set.title})}">
+  <title>Portfolio Set</title>
+</head>
+<body>
+  <header th:replace="~{fragments/layout :: header}"></header>
+
+  <main class="site-main set-viewer-main">
+    <div class="set-viewer-header" data-aos="fade-up">
+      <a href="/portfolio/" class="set-back-link">&larr; Back to Portfolio</a>
+      <h1 th:text="${set.title}">Set Title</h1>
+      <p th:if="${set.description}" class="set-description" th:text="${set.description}">Description</p>
+    </div>
+
+    <div th:if="${items.isEmpty()}" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+      <p>This set has no items yet.</p>
+    </div>
+
+    <div th:if="${!items.isEmpty()}" class="set-viewer-container">
+      <!-- Thumbnail Sidebar -->
+      <nav class="set-viewer-sidebar" id="setViewerSidebar">
+        <div class="sidebar-thumb"
+             th:each="item, iter : ${items}"
+             th:id="'thumb-' + ${iter.index}"
+             th:classappend="${iter.index == 0 ? ' active' : ''}"
+             th:attr="data-index=${iter.index}">
+          <div class="thumb-number" th:text="${iter.index + 1}">1</div>
+          <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
+               th:alt="${item.title}">
+        </div>
+      </nav>
+
+      <!-- Main Content: All items stacked vertically -->
+      <div class="set-viewer-content" id="setViewerContent">
+        <div class="set-viewer-item"
+             th:each="item, iter : ${items}"
+             th:id="'set-item-' + ${iter.index}"
+             th:attr="data-index=${iter.index}">
+          <img th:src="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
+               th:alt="${item.title}">
+          <div class="set-viewer-item-info">
+            <h3 th:text="${item.title}">Item Title</h3>
+            <p th:if="${item.description}" th:text="${item.description}">Description</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item data for JavaScript -->
+    <script th:if="${!items.isEmpty()}" th:inline="javascript">
+      /*<![CDATA[*/
+      var setItems = /*[[${itemsJson}]]*/ [];
+      /*]]>*/
+    </script>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+  <div th:replace="~{fragments/layout :: scripts}"></div>
+  <script src="/js/set-viewer.js"></script>
+</body>
+</html>
