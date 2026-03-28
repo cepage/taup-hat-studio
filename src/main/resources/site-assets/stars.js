@@ -1,6 +1,6 @@
 /**
- * Decorative Star Background — generates 4-pointed star SVGs that
- * twinkle and drift across the page, fading based on scroll proximity.
+ * Decorative Star Background — scatters star images that twinkle
+ * and drift across the page, fading based on scroll proximity.
  */
 (function () {
   'use strict';
@@ -9,10 +9,9 @@
   if (!container) return;
 
   var STAR_COUNT = 22;
-  var STAR_SVG =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z" fill="currentColor"/>' +
-    '</svg>';
+  var STAR_IMG =
+    '<img src="/images/star.png" alt="" aria-hidden="true" draggable="false" ' +
+    'style="width:100%;height:100%">';
 
   var stars = [];
   var docH = 1;
@@ -20,7 +19,7 @@
   for (var i = 0; i < STAR_COUNT; i++) {
     var el = document.createElement('div');
     el.className = 'star-decoration';
-    el.innerHTML = STAR_SVG;
+    el.innerHTML = STAR_IMG;
 
     var size = 14 + Math.random() * 30;
     var left = Math.random() * 96 + 2;

@@ -23,6 +23,10 @@ public class GeneratedSite {
         files.put(path, new FileEntry(content.getBytes(java.nio.charset.StandardCharsets.UTF_8), "application/javascript; charset=utf-8"));
     }
 
+    public void addBinary(String path, byte[] content, String contentType) {
+        files.put(path, new FileEntry(content, contentType));
+    }
+
     public Map<String, FileEntry> getFiles() {
         return files;
     }

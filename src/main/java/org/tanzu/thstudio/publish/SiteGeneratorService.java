@@ -96,6 +96,9 @@ public class SiteGeneratorService {
         site.addJs("js/set-viewer.js", loadStaticAsset("site-assets/set-viewer.js"));
         site.addJs("js/about-carousel.js", loadStaticAsset("site-assets/about-carousel.js"));
 
+        // Image assets
+        site.addBinary("images/star.png", loadStaticBinaryAsset("site-assets/star.png"), "image/png");
+
         // Home page
         site.addHtml("index.html", renderHome(config, activeSeries, portfolioItems));
 
@@ -403,7 +406,6 @@ public class SiteGeneratorService {
                 
                 .star-decoration {
                   position: absolute;
-                  color: var(--color-primary);
                   opacity: 0;
                   animation: starTwinkle 4s ease-in-out infinite alternate;
                   transition: opacity 0.5s ease;
@@ -1321,6 +1323,15 @@ public class SiteGeneratorService {
         } catch (IOException e) {
             log.error("Failed to load static asset: {}", classpath, e);
             return "/* Failed to load " + classpath + " */";
+        }
+    }
+
+    private byte[] loadStaticBinaryAsset(String classpath) {
+        try {
+            return new ClassPathResource(classpath).getContentAsByteArray();
+        } catch (IOException e) {
+            log.error("Failed to load static binary asset: {}", classpath, e);
+            return new byte[0];
         }
     }
 }
