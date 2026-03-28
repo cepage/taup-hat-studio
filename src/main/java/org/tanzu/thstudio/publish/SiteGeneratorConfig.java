@@ -20,15 +20,27 @@ public class SiteGeneratorConfig {
 
     @Bean("siteTemplateEngine")
     public SpringTemplateEngine siteTemplateEngine(ApplicationContext applicationContext) {
-        var resolver = new ClassLoaderTemplateResolver();
-        resolver.setPrefix("site-templates/");
-        resolver.setSuffix(".html");
-        resolver.setTemplateMode(TemplateMode.HTML);
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setCacheable(false);
+        var htmlResolver = new ClassLoaderTemplateResolver();
+        htmlResolver.setPrefix("site-templates/");
+        htmlResolver.setSuffix(".html");
+        htmlResolver.setTemplateMode(TemplateMode.HTML);
+        htmlResolver.setCharacterEncoding("UTF-8");
+        htmlResolver.setCacheable(false);
+        htmlResolver.setCheckExistence(true);
+        htmlResolver.setOrder(1);
+
+        var textResolver = new ClassLoaderTemplateResolver();
+        textResolver.setPrefix("site-templates/");
+        textResolver.setSuffix(".css.html");
+        textResolver.setTemplateMode(TemplateMode.TEXT);
+        textResolver.setCharacterEncoding("UTF-8");
+        textResolver.setCacheable(false);
+        textResolver.setCheckExistence(true);
+        textResolver.setOrder(0);
 
         var engine = new SpringTemplateEngine();
-        engine.setTemplateResolver(resolver);
+        engine.addTemplateResolver(textResolver);
+        engine.addTemplateResolver(htmlResolver);
         engine.setEnableSpringELCompiler(true);
         return engine;
     }
