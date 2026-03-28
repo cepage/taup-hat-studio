@@ -18,7 +18,7 @@
         <div th:if="${taglines != null and !taglines.isEmpty()}" class="tagline-rotator">
           <span class="tagline" th:each="tagline, iter : ${taglines}"
                 th:text="${tagline}"
-                th:styleappend="'animation-delay: ' + ${iter.index * (8 / taglines.size())} + 's'"
+                th:styleappend="'animation-delay: ' + ${iter.index * 3} + 's'"
                 th:classappend="${iter.index == 0} ? ' tagline-active' : ''">Tagline</span>
         </div>
       </div>

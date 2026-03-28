@@ -490,28 +490,30 @@ public class SiteGeneratorService {
                   overflow: hidden;
                   margin-bottom: 2.5rem;
                   background: var(--color-primary);
-                  min-height: 420px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
+                  min-height: 280px;
                   text-align: center;
                 }
                 
                 .hero-landing-bg {
-                  position: absolute;
-                  inset: 0;
+                  display: block;
+                  line-height: 0;
                 }
                 
                 .hero-landing-bg-img {
                   width: 100%%;
-                  height: 100%%;
-                  object-fit: cover;
-                  opacity: 0.35;
+                  height: auto;
+                  display: block;
+                  opacity: 0.15;
                 }
                 
                 .hero-landing-content {
-                  position: relative;
+                  position: absolute;
+                  inset: 0;
                   z-index: 1;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
                   padding: 3rem 2rem;
                 }
                 
@@ -529,6 +531,7 @@ public class SiteGeneratorService {
                   position: relative;
                   height: 2rem;
                   overflow: hidden;
+                  width: 100%%;
                 }
                 
                 .tagline {
@@ -550,7 +553,7 @@ public class SiteGeneratorService {
                   5%%   { opacity: 1; transform: translateY(0); }
                   %s%%  { opacity: 1; transform: translateY(0); }
                   %s%%  { opacity: 0; transform: translateY(-100%%); }
-                  100%% { opacity: 0; }
+                  100%% { opacity: 0; transform: translateY(-100%%); }
                 }
                 
                 /* ── Nav Buttons ─────────────────────────────────────────── */
@@ -1251,9 +1254,9 @@ public class SiteGeneratorService {
                 config.getBodyFont(),
                 taglineCount,
                 cycleDuration,
-                // Keyframe percentages: visible portion is ~30%% of each tagline's slot
-                String.format("%.0f", (1.0 / taglineCount) * 80),
-                String.format("%.0f", (1.0 / taglineCount) * 100)
+                // Keyframe percentages: hold ends early, fade-out completes before next tagline begins
+                String.format("%.0f", (1.0 / taglineCount) * 70),
+                String.format("%.0f", (1.0 / taglineCount) * 90)
         );
     }
 
