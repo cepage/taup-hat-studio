@@ -44,8 +44,14 @@
         </p>
         <a href="/about/" class="btn btn-primary">Learn more &rarr;</a>
       </div>
-      <div th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="home-about-image">
-        <img th:src="${config.heroImageUrl}" alt="About" class="about-preview-img">
+      <div th:if="${!portfolioItems.isEmpty()}" class="home-about-image">
+        <div class="about-carousel">
+          <img th:each="item, iter : ${portfolioItems}"
+               th:src="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
+               th:alt="${item.title}"
+               th:classappend="${iter.index == 0} ? ' active' : ''"
+               class="about-carousel-img">
+        </div>
       </div>
     </section>
 

@@ -94,6 +94,7 @@ public class SiteGeneratorService {
         site.addJs("js/portfolio-lightbox.js", loadStaticAsset("site-assets/portfolio-lightbox.js"));
         site.addJs("js/stars.js", loadStaticAsset("site-assets/stars.js"));
         site.addJs("js/set-viewer.js", loadStaticAsset("site-assets/set-viewer.js"));
+        site.addJs("js/about-carousel.js", loadStaticAsset("site-assets/about-carousel.js"));
 
         // Home page
         site.addHtml("index.html", renderHome(config, activeSeries, portfolioItems));
@@ -611,12 +612,31 @@ public class SiteGeneratorService {
                   white-space: pre-wrap;
                 }
                 
-                .about-preview-img {
+                .home-about-image {
+                  position: relative;
+                  overflow: hidden;
                   border-radius: var(--radius);
                   box-shadow: var(--shadow);
-                  width: 100%%;
                   aspect-ratio: 4/3;
+                }
+                
+                .about-carousel {
+                  position: absolute;
+                  inset: 0;
+                }
+                
+                .about-carousel-img {
+                  position: absolute;
+                  inset: 0;
+                  width: 100%%;
+                  height: 100%%;
                   object-fit: cover;
+                  opacity: 0;
+                  transition: opacity 1s ease;
+                }
+                
+                .about-carousel-img.active {
+                  opacity: 1;
                 }
                 
                 /* ── Project Circles (Home) ──────────────────────────────── */
