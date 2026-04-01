@@ -21,7 +21,7 @@
     el.className = 'star-decoration';
     el.innerHTML = STAR_IMG;
 
-    var size = 14 + Math.random() * 30;
+    var size = 28 + Math.random() * 60;
     var left = Math.random() * 96 + 2;
     var top = Math.random() * 100;
     var baseOpacity = 0.15 + Math.random() * 0.35;
