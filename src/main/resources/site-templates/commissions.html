@@ -15,9 +15,7 @@
       </p>
 
       <form class="commissions-form"
-            th:action="${commissionsEmail != null ? 'mailto:' + commissionsEmail : '#'}"
-            method="POST"
-            enctype="text/plain">
+            th:data-email="${commissionsEmail}">
         <div class="form-group">
           <label for="name">Name</label>
           <input type="text" id="name" name="name" required placeholder="Your name">
@@ -63,5 +61,6 @@
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
   <div th:replace="~{fragments/layout :: scripts}"></div>
+  <script src="/js/commissions-form.js"></script>
 </body>
 </html>

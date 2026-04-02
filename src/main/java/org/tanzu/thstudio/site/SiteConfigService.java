@@ -34,6 +34,8 @@ public class SiteConfigService {
         existing.setAboutText(updated.getAboutText());
         existing.setBigcartelUrl(updated.getBigcartelUrl());
         existing.setSocialLinks(updated.getSocialLinks());
+        existing.setSiteTaglines(updated.getSiteTaglines());
+        existing.setCommissionsEmail(updated.getCommissionsEmail());
         existing.setAdobeFontsUrl(updated.getAdobeFontsUrl());
         existing.setCustomFonts(updated.getCustomFonts());
         // Note: heroImageUrl is managed separately via the hero-image endpoint

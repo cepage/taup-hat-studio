@@ -72,6 +72,7 @@ public class SiteGeneratorService {
         site.addJs("js/stars.js", loadStaticAsset("site-assets/stars.js"));
         site.addJs("js/set-viewer.js", loadStaticAsset("site-assets/set-viewer.js"));
         site.addJs("js/about-carousel.js", loadStaticAsset("site-assets/about-carousel.js"));
+        site.addJs("js/commissions-form.js", loadStaticAsset("site-assets/commissions-form.js"));
 
         // Image assets
         site.addBinary("images/star.png", loadStaticBinaryAsset("site-assets/star.png"), "image/png");
