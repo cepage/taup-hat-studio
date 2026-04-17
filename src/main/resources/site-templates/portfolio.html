@@ -23,10 +23,8 @@
            th:href="${entry.item().optimizedUrl != null ? entry.item().optimizedUrl : entry.item().imageUrl}"
            th:attr="data-pswp-width=${entry.item().imageWidth != null ? entry.item().imageWidth : 1200},
                     data-pswp-height=${entry.item().imageHeight != null ? entry.item().imageHeight : 900},
-                    data-pswp-caption=${entry.item().title + (entry.item().description != null ? ' &mdash; ' + entry.item().description : '')},
-                    data-aos-delay=${iter.index * 100}"
-           target="_blank"
-           data-aos="fade-up">
+                    data-pswp-caption=${entry.item().title + (entry.item().description != null ? ' &mdash; ' + entry.item().description : '')}"
+           target="_blank">
           <img th:src="${entry.item().thumbnailUrl != null ? entry.item().thumbnailUrl : entry.item().imageUrl}"
                th:alt="${entry.item().title}">
           <div class="masonry-caption" th:text="${entry.item().title}">Item Title</div>
@@ -36,8 +34,7 @@
         <a class="masonry-item set-card-link"
            th:if="${entry.type() == 'set'}"
            th:href="'/portfolio/sets/' + ${entry.set().id} + '/'"
-           th:attr="data-aos-delay=${iter.index * 100}"
-           data-aos="fade-up">
+           >
           <div class="set-card-image-wrap">
             <img th:src="${entry.set().iconThumbnailUrl != null ? entry.set().iconThumbnailUrl : entry.set().iconImageUrl}"
                  th:alt="${entry.set().title}">
