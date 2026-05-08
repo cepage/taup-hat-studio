@@ -1,0 +1,109 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - img "Google" [ref=e7]
+    - generic [ref=e8]:
+      - heading "Couldn’t sign you in" [level=1] [ref=e11]
+      - generic [ref=e12]:
+        - generic [ref=e16]:
+          - paragraph [ref=e17]:
+            - text: This browser or app may not be secure.
+            - link "Learn more" [ref=e18] [cursor=pointer]:
+              - /url: https://support.google.com/accounts/answer/7675428?hl=en-US
+          - paragraph [ref=e19]: Try using a different browser. If you’re already using a supported browser, you can try again to sign in.
+        - link "Try again" [ref=e23] [cursor=pointer]:
+          - /url: /restart?app_domain=https://tauphat.apps.tas-ndc.kuhn-labs.com&client_id=629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com&code_challenge=5BNs--vfu2dkXdBOP0lHhWBbh4YxNc4ew20Pztmj3bA&code_challenge_method=S256&continue=https://accounts.google.com/signin/oauth/legacy/consent?authuser%3Dunknown%26part%3DAJi8hANShonozDy_RlY1pTNFUjiluB6keH_7bNDun-mR--yaGieVqoT4sbGhXfJVNEmhLxLsBrudpe3VTQk8XV-wMQadrsGxsOrFCZyYVVIRZqaRJejalNJBTes-JX9uD2lQeZKtdndTxf7BFUA_mMRLtzqK86hkj5wHMjkPPxBw9AyZsXRcyegbWZKYENIqpze9q_Yuwg9ry4L_cobqQRsapdWnnETbNTprCevUKVX4cBt6BY6YRoE0O8aazefvyo6YakziAFITMeMmISXn_MVSIPvg7VAnumZJO0Pw9YzQAzc35ldpinG1A0z3dI4ERdfdb79YBQJ-OatUBRkuPKfT8N7n_gSnQh_TBhU3p3ZbOjIuHXyCHJnaviiTq03-48yPyzFXqMuXzDTxXXiYSLWQHiXhqCTeSRAnjv-Hn92OUCoEM3DyW97qDNC4VXddSpP3JOTjlJYxbBjq_lppQH1SPTJMuzXC2PIextEv7MuihU7CYH7CW3s%26flowName%3DGeneralOAuthFlow%26as%3DS-1543166707%253A1776642887975889%26client_id%3D629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com%23&dsh=S-1543166707:1776642887975889&flowName=GeneralOAuthLite&nonce=3YTjMKd6CiCfx4R4s_vfPpESak8LV6DgRBFJR7_ZURs&o2v=2&opparams=%253F&rart=ANgoxcfroZdCFGYxascPoVA_eGR6UV2MTrY2naNYvofG6Vu7RuQKRexlUsctfRdyqKYmWfENf1AP3RNfE-HVnXKJBJgXO0-5_b71iMuJEaizCh1fpZEAgDs&redirect_uri=https://tauphat.apps.tas-ndc.kuhn-labs.com/login/oauth2/code/google&response_type=code&scope=openid+profile+email&service=lso&state=z8rNTBIzVS68DABPkc1232ZuVmQ0JY3f85GCsIyD8x4%3D
+  - contentinfo [ref=e24]:
+    - combobox [ref=e27] [cursor=pointer]:
+      - option "Afrikaans"
+      - option "azərbaycan"
+      - option "bosanski"
+      - option "català"
+      - option "Čeština"
+      - option "Cymraeg"
+      - option "Dansk"
+      - option "Deutsch"
+      - option "eesti"
+      - option "English (United Kingdom)"
+      - option "English (United States)" [selected]
+      - option "Español (España)"
+      - option "Español (Latinoamérica)"
+      - option "euskara"
+      - option "Filipino"
+      - option "Français (Canada)"
+      - option "Français (France)"
+      - option "Gaeilge"
+      - option "galego"
+      - option "Hrvatski"
+      - option "Indonesia"
+      - option "isiZulu"
+      - option "íslenska"
+      - option "Italiano"
+      - option "Kiswahili"
+      - option "latviešu"
+      - option "lietuvių"
+      - option "magyar"
+      - option "Melayu"
+      - option "Nederlands"
+      - option "norsk"
+      - option "o‘zbek"
+      - option "polski"
+      - option "Português (Brasil)"
+      - option "Português (Portugal)"
+      - option "română"
+      - option "shqip"
+      - option "Slovenčina"
+      - option "slovenščina"
+      - option "srpski (latinica)"
+      - option "Suomi"
+      - option "Svenska"
+      - option "Tiếng Việt"
+      - option "Türkçe"
+      - option "Ελληνικά"
+      - option "беларуская"
+      - option "български"
+      - option "кыргызча"
+      - option "қазақ тілі"
+      - option "македонски"
+      - option "монгол"
+      - option "Русский"
+      - option "српски (ћирилица)"
+      - option "Українська"
+      - option "ქართული"
+      - option "հայերեն"
+      - option "‫עברית‬‎"
+      - option "‫اردو‬‎"
+      - option "‫العربية‬‎"
+      - option "‫فارسی‬‎"
+      - option "አማርኛ"
+      - option "नेपाली"
+      - option "मराठी"
+      - option "हिन्दी"
+      - option "অসমীয়া"
+      - option "বাংলা"
+      - option "ਪੰਜਾਬੀ"
+      - option "ગુજરાતી"
+      - option "ଓଡ଼ିଆ"
+      - option "தமிழ்"
+      - option "తెలుగు"
+      - option "ಕನ್ನಡ"
+      - option "മലയാളം"
+      - option "සිංහල"
+      - option "ไทย"
+      - option "ລາວ"
+      - option "မြန်မာ"
+      - option "ខ្មែរ"
+      - option "한국어"
+      - option "中文（香港）"
+      - option "日本語"
+      - option "简体中文"
+      - option "繁體中文"
+    - list [ref=e28]:
+      - listitem [ref=e29]:
+        - link "Help" [ref=e30] [cursor=pointer]:
+          - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+      - listitem [ref=e31]:
+        - link "Privacy" [ref=e32] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=US&hl=en-US&privacy=true
+      - listitem [ref=e33]:
+        - link "Terms" [ref=e34] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=US&hl=en-US

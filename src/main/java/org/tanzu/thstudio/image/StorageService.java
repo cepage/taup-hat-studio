@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service for uploading and managing files in Google Cloud Storage.
@@ -111,6 +113,17 @@ public class StorageService {
         String bucket = properties.gcs().bucketName();
         getStorage().delete(BlobId.of(bucket, path));
         log.info("Deleted gs://{}/{}", bucket, path);
+    }
+
+    /**
+     * Lists all object names under the given prefix in GCS.
+     */
+    public List<String> listByPrefix(String prefix) {
+        String bucket = properties.gcs().bucketName();
+        var blobs = getStorage().list(bucket, Storage.BlobListOption.prefix(prefix));
+        List<String> names = new ArrayList<>();
+        for (Blob blob : blobs.iterateAll()) names.add(blob.getName());
+        return names;
     }
 
     /**

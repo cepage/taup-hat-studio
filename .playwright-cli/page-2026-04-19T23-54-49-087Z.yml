@@ -1,0 +1,119 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img "Google" [ref=e10]
+      - generic [ref=e11]: Sign in with Google
+    - generic [ref=e12]:
+      - generic [ref=e14]:
+        - heading "Sign in" [level=1] [ref=e15]
+        - paragraph [ref=e16]:
+          - text: to continue to
+          - button "kuhn-labs.com" [ref=e17] [cursor=pointer]
+      - generic [ref=e18]:
+        - generic [ref=e21]:
+          - generic [ref=e26]:
+            - textbox "Email or phone" [active] [ref=e27]
+            - generic:
+              - generic: Email or phone
+          - paragraph [ref=e28]:
+            - link "Forgot email?" [ref=e29] [cursor=pointer]:
+              - /url: /signin/v2/usernamerecovery?app_domain=https://tauphat.apps.tas-ndc.kuhn-labs.com&client_id=629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com&code_challenge=5BNs--vfu2dkXdBOP0lHhWBbh4YxNc4ew20Pztmj3bA&code_challenge_method=S256&continue=https://accounts.google.com/signin/oauth/legacy/consent?authuser%3Dunknown%26part%3DAJi8hANShonozDy_RlY1pTNFUjiluB6keH_7bNDun-mR--yaGieVqoT4sbGhXfJVNEmhLxLsBrudpe3VTQk8XV-wMQadrsGxsOrFCZyYVVIRZqaRJejalNJBTes-JX9uD2lQeZKtdndTxf7BFUA_mMRLtzqK86hkj5wHMjkPPxBw9AyZsXRcyegbWZKYENIqpze9q_Yuwg9ry4L_cobqQRsapdWnnETbNTprCevUKVX4cBt6BY6YRoE0O8aazefvyo6YakziAFITMeMmISXn_MVSIPvg7VAnumZJO0Pw9YzQAzc35ldpinG1A0z3dI4ERdfdb79YBQJ-OatUBRkuPKfT8N7n_gSnQh_TBhU3p3ZbOjIuHXyCHJnaviiTq03-48yPyzFXqMuXzDTxXXiYSLWQHiXhqCTeSRAnjv-Hn92OUCoEM3DyW97qDNC4VXddSpP3JOTjlJYxbBjq_lppQH1SPTJMuzXC2PIextEv7MuihU7CYH7CW3s%26flowName%3DGeneralOAuthFlow%26as%3DS-1543166707%253A1776642887975889%26client_id%3D629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com%23&dsh=S-1543166707:1776642887975889&flowName=GeneralOAuthLite&nonce=3YTjMKd6CiCfx4R4s_vfPpESak8LV6DgRBFJR7_ZURs&o2v=2&opparams=%253F&rart=ANgoxcfroZdCFGYxascPoVA_eGR6UV2MTrY2naNYvofG6Vu7RuQKRexlUsctfRdyqKYmWfENf1AP3RNfE-HVnXKJBJgXO0-5_b71iMuJEaizCh1fpZEAgDs&redirect_uri=https://tauphat.apps.tas-ndc.kuhn-labs.com/login/oauth2/code/google&response_type=code&scope=openid+profile+email&service=lso&state=z8rNTBIzVS68DABPkc1232ZuVmQ0JY3f85GCsIyD8x4%3D
+        - generic [ref=e31]:
+          - button "Next" [ref=e33]
+          - link "Create account" [ref=e35] [cursor=pointer]:
+            - /url: /lifecycle/flows/signup?app_domain=https://tauphat.apps.tas-ndc.kuhn-labs.com&client_id=629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com&code_challenge=5BNs--vfu2dkXdBOP0lHhWBbh4YxNc4ew20Pztmj3bA&code_challenge_method=S256&continue=https://accounts.google.com/signin/oauth/legacy/consent?authuser%3Dunknown%26part%3DAJi8hANShonozDy_RlY1pTNFUjiluB6keH_7bNDun-mR--yaGieVqoT4sbGhXfJVNEmhLxLsBrudpe3VTQk8XV-wMQadrsGxsOrFCZyYVVIRZqaRJejalNJBTes-JX9uD2lQeZKtdndTxf7BFUA_mMRLtzqK86hkj5wHMjkPPxBw9AyZsXRcyegbWZKYENIqpze9q_Yuwg9ry4L_cobqQRsapdWnnETbNTprCevUKVX4cBt6BY6YRoE0O8aazefvyo6YakziAFITMeMmISXn_MVSIPvg7VAnumZJO0Pw9YzQAzc35ldpinG1A0z3dI4ERdfdb79YBQJ-OatUBRkuPKfT8N7n_gSnQh_TBhU3p3ZbOjIuHXyCHJnaviiTq03-48yPyzFXqMuXzDTxXXiYSLWQHiXhqCTeSRAnjv-Hn92OUCoEM3DyW97qDNC4VXddSpP3JOTjlJYxbBjq_lppQH1SPTJMuzXC2PIextEv7MuihU7CYH7CW3s%26flowName%3DGeneralOAuthFlow%26as%3DS-1543166707%253A1776642887975889%26client_id%3D629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com%23&dsh=S-1543166707:1776642887975889&flowEntry=SignUp&flowName=GlifWebSignIn&nonce=3YTjMKd6CiCfx4R4s_vfPpESak8LV6DgRBFJR7_ZURs&o2v=2&opparams=%253F&rart=ANgoxcfroZdCFGYxascPoVA_eGR6UV2MTrY2naNYvofG6Vu7RuQKRexlUsctfRdyqKYmWfENf1AP3RNfE-HVnXKJBJgXO0-5_b71iMuJEaizCh1fpZEAgDs&redirect_uri=https://tauphat.apps.tas-ndc.kuhn-labs.com/login/oauth2/code/google&response_type=code&scope=openid+profile+email&service=lso&signInUrl=https://accounts.google.com/signin/oauth?app_domain%3Dhttps://tauphat.apps.tas-ndc.kuhn-labs.com%26client_id%3D629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com%26code_challenge%3D5BNs--vfu2dkXdBOP0lHhWBbh4YxNc4ew20Pztmj3bA%26code_challenge_method%3DS256%26continue%3Dhttps://accounts.google.com/signin/oauth/legacy/consent?authuser%253Dunknown%2526part%253DAJi8hANShonozDy_RlY1pTNFUjiluB6keH_7bNDun-mR--yaGieVqoT4sbGhXfJVNEmhLxLsBrudpe3VTQk8XV-wMQadrsGxsOrFCZyYVVIRZqaRJejalNJBTes-JX9uD2lQeZKtdndTxf7BFUA_mMRLtzqK86hkj5wHMjkPPxBw9AyZsXRcyegbWZKYENIqpze9q_Yuwg9ry4L_cobqQRsapdWnnETbNTprCevUKVX4cBt6BY6YRoE0O8aazefvyo6YakziAFITMeMmISXn_MVSIPvg7VAnumZJO0Pw9YzQAzc35ldpinG1A0z3dI4ERdfdb79YBQJ-OatUBRkuPKfT8N7n_gSnQh_TBhU3p3ZbOjIuHXyCHJnaviiTq03-48yPyzFXqMuXzDTxXXiYSLWQHiXhqCTeSRAnjv-Hn92OUCoEM3DyW97qDNC4VXddSpP3JOTjlJYxbBjq_lppQH1SPTJMuzXC2PIextEv7MuihU7CYH7CW3s%2526flowName%253DGeneralOAuthFlow%2526as%253DS-1543166707%25253A1776642887975889%2526client_id%253D629782033007-cnvf1032v2ere795jfm7tdamh25gaoip.apps.googleusercontent.com%2523%26dsh%3DS-1543166707:1776642887975889%26flowName%3DGeneralOAuthLite%26nonce%3D3YTjMKd6CiCfx4R4s_vfPpESak8LV6DgRBFJR7_ZURs%26o2v%3D2%26opparams%3D%25253F%26rart%3DANgoxcfroZdCFGYxascPoVA_eGR6UV2MTrY2naNYvofG6Vu7RuQKRexlUsctfRdyqKYmWfENf1AP3RNfE-HVnXKJBJgXO0-5_b71iMuJEaizCh1fpZEAgDs%26redirect_uri%3Dhttps://tauphat.apps.tas-ndc.kuhn-labs.com/login/oauth2/code/google%26response_type%3Dcode%26scope%3Dopenid%2Bprofile%2Bemail%26service%3Dlso%26state%3Dz8rNTBIzVS68DABPkc1232ZuVmQ0JY3f85GCsIyD8x4%253D&state=z8rNTBIzVS68DABPkc1232ZuVmQ0JY3f85GCsIyD8x4%3D
+  - contentinfo [ref=e36]:
+    - combobox [ref=e39] [cursor=pointer]:
+      - option "Afrikaans"
+      - option "azərbaycan"
+      - option "bosanski"
+      - option "català"
+      - option "Čeština"
+      - option "Cymraeg"
+      - option "Dansk"
+      - option "Deutsch"
+      - option "eesti"
+      - option "English (United Kingdom)"
+      - option "English (United States)" [selected]
+      - option "Español (España)"
+      - option "Español (Latinoamérica)"
+      - option "euskara"
+      - option "Filipino"
+      - option "Français (Canada)"
+      - option "Français (France)"
+      - option "Gaeilge"
+      - option "galego"
+      - option "Hrvatski"
+      - option "Indonesia"
+      - option "isiZulu"
+      - option "íslenska"
+      - option "Italiano"
+      - option "Kiswahili"
+      - option "latviešu"
+      - option "lietuvių"
+      - option "magyar"
+      - option "Melayu"
+      - option "Nederlands"
+      - option "norsk"
+      - option "o‘zbek"
+      - option "polski"
+      - option "Português (Brasil)"
+      - option "Português (Portugal)"
+      - option "română"
+      - option "shqip"
+      - option "Slovenčina"
+      - option "slovenščina"
+      - option "srpski (latinica)"
+      - option "Suomi"
+      - option "Svenska"
+      - option "Tiếng Việt"
+      - option "Türkçe"
+      - option "Ελληνικά"
+      - option "беларуская"
+      - option "български"
+      - option "кыргызча"
+      - option "қазақ тілі"
+      - option "македонски"
+      - option "монгол"
+      - option "Русский"
+      - option "српски (ћирилица)"
+      - option "Українська"
+      - option "ქართული"
+      - option "հայերեն"
+      - option "‫עברית‬‎"
+      - option "‫اردو‬‎"
+      - option "‫العربية‬‎"
+      - option "‫فارسی‬‎"
+      - option "አማርኛ"
+      - option "नेपाली"
+      - option "मराठी"
+      - option "हिन्दी"
+      - option "অসমীয়া"
+      - option "বাংলা"
+      - option "ਪੰਜਾਬੀ"
+      - option "ગુજરાતી"
+      - option "ଓଡ଼ିଆ"
+      - option "தமிழ்"
+      - option "తెలుగు"
+      - option "ಕನ್ನಡ"
+      - option "മലയാളം"
+      - option "සිංහල"
+      - option "ไทย"
+      - option "ລາວ"
+      - option "မြန်မာ"
+      - option "ខ្មែរ"
+      - option "한국어"
+      - option "中文（香港）"
+      - option "日本語"
+      - option "简体中文"
+      - option "繁體中文"
+    - list [ref=e40]:
+      - listitem [ref=e41]:
+        - link "Help" [ref=e42] [cursor=pointer]:
+          - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+      - listitem [ref=e43]:
+        - link "Privacy" [ref=e44] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=US&hl=en-US&privacy=true
+      - listitem [ref=e45]:
+        - link "Terms" [ref=e46] [cursor=pointer]:
+          - /url: https://accounts.google.com/TOS?loc=US&hl=en-US
