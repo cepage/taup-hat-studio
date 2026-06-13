@@ -67,15 +67,23 @@
       </form>
 
       <div class="commissions-success" id="commissionsSuccess" hidden>
-        <h2>Your request is ready to send</h2>
-        <p>Your email app should have opened with the details filled in. If nothing happened,
-           email <a th:href="'mailto:' + ${commissionsEmail}" th:text="${commissionsEmail}">us</a> directly.</p>
+        <h2>Request sent!</h2>
+        <p>Thanks for reaching out — I'll get back to you as soon as possible.</p>
+      </div>
+
+      <div class="commissions-error" id="commissionsError" hidden>
+        <h2>Something went wrong</h2>
+        <p>Your request couldn't be sent automatically. Please email it to
+           <a th:href="'mailto:' + ${commissionsEmail}" th:text="${commissionsEmail}" id="commissionsErrorEmail">us</a>
+           directly, or copy the address below.</p>
+        <button type="button" class="btn btn-secondary" id="commissionsCopyEmail"
+                th:data-email="${commissionsEmail}">Copy email address</button>
       </div>
     </div>
   </main>
 
   <footer th:replace="~{fragments/layout :: footer}"></footer>
   <div th:replace="~{fragments/layout :: scripts}"></div>
-  <script src="/js/commissions-form.js"></script>
+  <script type="module" src="/js/commissions-form.js"></script>
 </body>
 </html>

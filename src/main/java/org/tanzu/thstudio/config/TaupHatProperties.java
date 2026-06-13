@@ -19,9 +19,18 @@ public record TaupHatProperties(SecurityProperties security, GcsProperties gcs, 
         }
     }
 
-    public record FirebaseProperties(String siteId) {
+    public record FirebaseProperties(String siteId, String apiKey, String authDomain, String projectId,
+                                      String storageBucket, String messagingSenderId, String appId,
+                                      String recaptchaSiteKey) {
         public FirebaseProperties {
             if (siteId == null) siteId = "";
+            if (apiKey == null) apiKey = "";
+            if (authDomain == null) authDomain = "";
+            if (projectId == null) projectId = "";
+            if (storageBucket == null) storageBucket = "";
+            if (messagingSenderId == null) messagingSenderId = "";
+            if (appId == null) appId = "";
+            if (recaptchaSiteKey == null) recaptchaSiteKey = "";
         }
     }
 }

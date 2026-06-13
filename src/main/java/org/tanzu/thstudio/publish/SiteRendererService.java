@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.tanzu.thstudio.config.TaupHatProperties;
 import org.tanzu.thstudio.portfolio.PortfolioItem;
 import org.tanzu.thstudio.portfolio.PortfolioItemRepository;
 import org.tanzu.thstudio.portfolio.PortfolioSet;
@@ -36,13 +37,16 @@ class SiteRendererService {
 
     private final TemplateEngine templateEngine;
     private final PortfolioItemRepository portfolioRepository;
+    private final TaupHatProperties properties;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     SiteRendererService(
             @Qualifier("siteTemplateEngine") TemplateEngine templateEngine,
-            PortfolioItemRepository portfolioRepository) {
+            PortfolioItemRepository portfolioRepository,
+            TaupHatProperties properties) {
         this.templateEngine = templateEngine;
         this.portfolioRepository = portfolioRepository;
+        this.properties = properties;
     }
 
     // ── CSS ──────────────────────────────────────────────────────────────────
@@ -223,6 +227,18 @@ class SiteRendererService {
         ctx.setVariable("adobeFontsUrl", config.getAdobeFontsUrl());
         ctx.setVariable("year", LocalDateTime.now().getYear());
         ctx.setVariable("generatedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        var firebase = properties.firebase();
+        ctx.setVariable("firebaseConfig", Map.of(
+                "apiKey", firebase.apiKey(),
+                "authDomain", firebase.authDomain(),
+                "projectId", firebase.projectId(),
+                "storageBucket", firebase.storageBucket(),
+                "messagingSenderId", firebase.messagingSenderId(),
+                "appId", firebase.appId()
+        ));
+        ctx.setVariable("recaptchaSiteKey", firebase.recaptchaSiteKey());
+
         return ctx;
     }
 

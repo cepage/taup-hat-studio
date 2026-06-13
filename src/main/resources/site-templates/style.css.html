@@ -590,7 +590,8 @@ h1, h2, h3, h4 {
   overflow: hidden;
 }
 
-.commissions-success {
+.commissions-success,
+.commissions-error {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -598,7 +599,15 @@ h1, h2, h3, h4 {
   text-align: center;
   box-shadow: var(--shadow);
 }
-.commissions-success h2 { margin-bottom: 0.5rem; }
+.commissions-success h2,
+.commissions-error h2 { margin-bottom: 0.5rem; }
+
+.commissions-error {
+  margin-top: 1.5rem;
+}
+.commissions-error #commissionsCopyEmail {
+  margin-top: 1rem;
+}
 
 .commissions-form {
   display: flex;
