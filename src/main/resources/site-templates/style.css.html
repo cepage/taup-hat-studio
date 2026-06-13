@@ -177,26 +177,33 @@ h1, h2, h3, h4 {
   overflow: hidden;
   margin-bottom: 2.5rem;
   background: var(--color-primary);
-  min-height: 280px;
+  min-height: clamp(320px, 52vh, 560px);
+  display: flex;
   text-align: center;
 }
 
-.hero-landing-bg {
-  display: block;
-  line-height: 0;
+.hero-landing-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
 }
 
-.hero-landing-bg-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  opacity: 0.15;
+/* Legibility scrim only when there's a photo behind the text */
+.hero-landing.has-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%);
 }
 
 .hero-landing-content {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 1;
+  margin: auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,7 +223,7 @@ h1, h2, h3, h4 {
 
 .tagline-rotator {
   position: relative;
-  height: 2rem;
+  min-height: 2.5rem;
   overflow: hidden;
   width: 100%;
 }
@@ -225,12 +232,13 @@ h1, h2, h3, h4 {
   position: absolute;
   width: 100%;
   left: 0;
-  color: var(--color-secondary);
+  color: color-mix(in srgb, var(--color-secondary) 60%, white 40%);
   font-family: var(--font-heading);
   font-size: 1.3rem;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.45);
   opacity: 0;
   animation: taglineCycle var(--tagline-cycle) ease-in-out infinite;
 }
@@ -485,6 +493,34 @@ h1, h2, h3, h4 {
   font-size: 1rem;
 }
 
+/* ── Portfolio Filter Chips ──────────────────────────────── */
+
+.portfolio-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.filter-chip {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.filter-chip:hover { border-color: var(--color-primary); color: var(--color-text); }
+.filter-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.masonry-item[hidden] { display: none; }
+
 /* ── Masonry Portfolio Grid ──────────────────────────────── */
 
 .masonry-grid {
@@ -537,10 +573,41 @@ h1, h2, h3, h4 {
   line-height: 1.7;
 }
 
+.commissions-note {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-secondary) 22%, transparent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.commissions-success {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.commissions-success h2 { margin-bottom: 0.5rem; }
+
 .commissions-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.commissions-form[hidden] {
+  display: none;
 }
 
 .form-group {
@@ -720,6 +787,11 @@ h1, h2, h3, h4 {
 
 .set-card-image-wrap {
   position: relative;
+}
+
+.set-card-image-wrap img {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
 }
 
 .set-badge-overlay {
@@ -951,4 +1023,16 @@ h1, h2, h3, h4 {
   .hero-title {
     font-size: 2rem;
   }
+}
+
+/* ── Reduced motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .stars-container { display: none; }
+  .page-fade-in { opacity: 1 !important; transform: none !important; }
 }

@@ -5,7 +5,7 @@
 </head>
 <body class="page-fade-in">
   <div th:replace="~{fragments/layout :: stars}"></div>
-  <header th:replace="~{fragments/layout :: header}"></header>
+  <header th:replace="~{fragments/layout :: header('comics')}"></header>
 
   <main class="site-main">
     <div class="section-header" data-aos="fade-up">
@@ -27,6 +27,7 @@
         <img th:if="${issue.coverImageUrl != null}"
              th:src="${issue.coverImageUrl}"
              th:alt="${issue.title}"
+             loading="lazy" decoding="async"
              class="card-image">
         <div class="card-body">
           <h3 th:text="${issue.title}">Issue Title</h3>

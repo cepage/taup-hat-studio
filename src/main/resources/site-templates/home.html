@@ -5,14 +5,15 @@
 </head>
 <body class="page-fade-in">
   <div th:replace="~{fragments/layout :: stars}"></div>
-  <header th:replace="~{fragments/layout :: header}"></header>
+  <header th:replace="~{fragments/layout :: header('home')}"></header>
 
   <main class="site-main home-main">
     <!-- Hero section with rotating taglines -->
-    <section class="hero-landing" data-aos="fade" data-aos-duration="1200">
-      <div th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}" class="hero-landing-bg">
-        <img th:src="${config.heroImageUrl}" alt="" class="hero-landing-bg-img">
-      </div>
+    <section class="hero-landing"
+             th:classappend="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()} ? ' has-image' : ''"
+             data-aos="fade" data-aos-duration="1200">
+      <img th:if="${config.heroImageUrl != null and !config.heroImageUrl.isEmpty()}"
+           th:src="${config.heroImageUrl}" alt="" class="hero-landing-bg-img" fetchpriority="high">
       <div class="hero-landing-content">
         <h1 class="hero-title" th:text="${siteName}">Site Name</h1>
         <div th:if="${taglines != null and !taglines.isEmpty()}" class="tagline-rotator">
@@ -50,6 +51,7 @@
                th:src="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
                th:alt="${item.title}"
                th:classappend="${iter.index == 0} ? ' active' : ''"
+               th:attr="loading=${iter.index == 0} ? null : 'lazy', decoding=${iter.index == 0} ? null : 'async'"
                class="about-carousel-img">
         </div>
       </div>
@@ -67,7 +69,8 @@
           <span class="project-circle-title" th:text="${item.title}">Title</span>
           <div class="project-circle-img-wrap">
             <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
-                 th:alt="${item.title}">
+                 th:alt="${item.title}"
+                 loading="lazy" decoding="async">
           </div>
           <span th:if="${item.category != null}" class="project-circle-subtitle" th:text="${item.category}">Category</span>
         </a>
@@ -85,6 +88,7 @@
           <img th:if="${latestIssue.coverImageUrl != null}"
                th:src="${latestIssue.coverImageUrl}"
                th:alt="${latestIssue.title}"
+               loading="lazy" decoding="async"
                class="card-image">
           <div class="card-body">
             <h3 th:text="${latestIssueSeries.title}">Series</h3>

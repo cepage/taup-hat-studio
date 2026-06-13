@@ -7,7 +7,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="TaupHat Studio">
-  <title th:text="${pageTitle} + ' — ' + ${siteName}" />
+
+  <title th:text="${pageTitle} + ' — ' + ${siteName}">Title</title>
+
+  <!-- SEO / social meta -->
+  <th:block th:with="desc=${metaDescription != null and !metaDescription.isEmpty()
+                            ? metaDescription
+                            : (config.aboutText != null and !config.aboutText.isEmpty()
+                                ? #strings.abbreviate(config.aboutText, 160)
+                                : siteName + ' — illustration, comics & commissions.')},
+                     ogImg=${ogImageUrl != null and !ogImageUrl.isEmpty()
+                            ? ogImageUrl
+                            : config.heroImageUrl}">
+    <meta name="description" th:content="${desc}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" th:content="${siteName}">
+    <meta property="og:title" th:content="${pageTitle} + ' — ' + ${siteName}">
+    <meta property="og:description" th:content="${desc}">
+    <meta th:if="${ogImg != null and !ogImg.isEmpty()}" property="og:image" th:content="${ogImg}">
+    <meta th:if="${canonicalUrl != null and !canonicalUrl.isEmpty()}" property="og:url" th:content="${canonicalUrl}">
+    <meta name="twitter:card" th:content="${ogImg != null and !ogImg.isEmpty()} ? 'summary_large_image' : 'summary'">
+    <meta name="twitter:title" th:content="${pageTitle} + ' — ' + ${siteName}">
+    <meta name="twitter:description" th:content="${desc}">
+    <meta th:if="${ogImg != null and !ogImg.isEmpty()}" name="twitter:image" th:content="${ogImg}">
+  </th:block>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+
+  <!-- Fonts: preconnect cuts the render-blocking @import latency in style.css -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link rel="stylesheet" href="/css/style.css">
   <link th:if="${adobeFontsUrl != null and !adobeFontsUrl.isEmpty()}" rel="stylesheet" th:href="${adobeFontsUrl}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.css">
@@ -15,16 +47,17 @@
 </head>
 
 <!-- Site header with navigation -->
-<header th:fragment="header" class="site-header">
+<header th:fragment="header(active)" class="site-header">
   <div class="header-inner">
     <a href="/" class="site-logo" th:text="${siteName}">Site Name</a>
-    <button class="hamburger" onclick="document.querySelector('.site-nav').classList.toggle('open')" aria-label="Menu">&#9776;</button>
-    <nav class="site-nav">
-      <a href="/">Home</a>
-      <a href="/comics/">Comics</a>
-      <a href="/portfolio/">Portfolio</a>
-      <a href="/commissions/">Commissions</a>
-      <a href="/about/">About</a>
+    <button class="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="siteNav"
+            onclick="var n=document.getElementById('siteNav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded', o);">&#9776;</button>
+    <nav class="site-nav" id="siteNav">
+      <a href="/"             th:classappend="${active == 'home'}        ? 'active' : ''" th:attr="aria-current=${active == 'home'}        ? 'page' : null">Home</a>
+      <a href="/comics/"      th:classappend="${active == 'comics'}      ? 'active' : ''" th:attr="aria-current=${active == 'comics'}      ? 'page' : null">Comics</a>
+      <a href="/portfolio/"   th:classappend="${active == 'portfolio'}   ? 'active' : ''" th:attr="aria-current=${active == 'portfolio'}   ? 'page' : null">Portfolio</a>
+      <a href="/commissions/" th:classappend="${active == 'commissions'} ? 'active' : ''" th:attr="aria-current=${active == 'commissions'} ? 'page' : null">Commissions</a>
+      <a href="/about/"       th:classappend="${active == 'about'}       ? 'active' : ''" th:attr="aria-current=${active == 'about'}       ? 'page' : null">About</a>
       <a th:if="${config.bigcartelUrl != null and !config.bigcartelUrl.isEmpty()}"
          th:href="${config.bigcartelUrl}" target="_blank" rel="noopener">Shop</a>
     </nav>
@@ -47,11 +80,13 @@
   <script src="/js/stars.js"></script>
   <script src="/js/about-carousel.js"></script>
   <script>
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     AOS.init({
       duration: 800,
       easing: 'ease-out-cubic',
       once: true,
       offset: 50,
+      disable: prefersReduced
     });
   </script>
 </div>

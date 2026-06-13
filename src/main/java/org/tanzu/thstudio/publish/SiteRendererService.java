@@ -103,6 +103,12 @@ class SiteRendererService {
         var ctx = baseContext(config);
         ctx.setVariable("series", series);
         ctx.setVariable("issues", publishedIssues);
+        if (series.getDescription() != null && !series.getDescription().isEmpty()) {
+            ctx.setVariable("metaDescription", series.getDescription());
+        }
+        if (series.getCoverImageUrl() != null && !series.getCoverImageUrl().isEmpty()) {
+            ctx.setVariable("ogImageUrl", series.getCoverImageUrl());
+        }
         return templateEngine.process("series-detail", ctx);
     }
 
@@ -113,6 +119,10 @@ class SiteRendererService {
         ctx.setVariable("series", series);
         ctx.setVariable("issue", issue);
         ctx.setVariable("pages", pages);
+        ctx.setVariable("metaDescription", series.getTitle() + " #" + issue.getIssueNumber() + ": " + issue.getTitle());
+        if (issue.getCoverImageUrl() != null && !issue.getCoverImageUrl().isEmpty()) {
+            ctx.setVariable("ogImageUrl", issue.getCoverImageUrl());
+        }
 
         var pagesJson = pages.stream().map(p -> {
             var map = new LinkedHashMap<String, Object>();
@@ -165,6 +175,18 @@ class SiteRendererService {
         var ctx = baseContext(config);
         ctx.setVariable("set", set);
         ctx.setVariable("items", items);
+
+        if (set.getDescription() != null && !set.getDescription().isEmpty()) {
+            ctx.setVariable("metaDescription", set.getDescription());
+        }
+        var setImage = set.getIconOptimizedUrl() != null ? set.getIconOptimizedUrl() : set.getIconImageUrl();
+        if ((setImage == null || setImage.isEmpty()) && !items.isEmpty()) {
+            var first = items.getFirst();
+            setImage = first.getOptimizedUrl() != null ? first.getOptimizedUrl() : first.getImageUrl();
+        }
+        if (setImage != null && !setImage.isEmpty()) {
+            ctx.setVariable("ogImageUrl", setImage);
+        }
 
         var itemsJson = items.stream().map(item -> {
             var map = new LinkedHashMap<String, Object>();

@@ -63,6 +63,18 @@
           <mat-icon matPrefix>email</mat-icon>
           <mat-hint>Email address used for the commissions contact form</mat-hint>
         </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Commissions Note</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="cfg.commissionsNote"
+            rows="3"
+            placeholder="e.g. Commissions are currently open! Typical turnaround is 2-3 weeks."
+          ></textarea>
+          <mat-icon matPrefix>campaign</mat-icon>
+          <mat-hint>Optional note shown above the commissions form (e.g. open/closed status)</mat-hint>
+        </mat-form-field>
       </mat-card-content>
     </mat-card>
 

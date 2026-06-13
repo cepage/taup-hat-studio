@@ -5,6 +5,8 @@
 (function () {
   'use strict';
 
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
   var container = document.getElementById('starsContainer');
   if (!container) return;
 

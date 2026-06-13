@@ -48,6 +48,9 @@ public class SiteConfig {
 
     private String commissionsEmail;
 
+    @Column(columnDefinition = "TEXT")
+    private String commissionsNote;
+
     @Column(length = 1024)
     private String adobeFontsUrl;
 
@@ -92,6 +95,9 @@ public class SiteConfig {
 
     public String getCommissionsEmail() { return commissionsEmail; }
     public void setCommissionsEmail(String commissionsEmail) { this.commissionsEmail = commissionsEmail; }
+
+    public String getCommissionsNote() { return commissionsNote; }
+    public void setCommissionsNote(String commissionsNote) { this.commissionsNote = commissionsNote; }
 
     public String getAdobeFontsUrl() { return adobeFontsUrl; }
     public void setAdobeFontsUrl(String adobeFontsUrl) { this.adobeFontsUrl = adobeFontsUrl; }

@@ -4,7 +4,7 @@
   <title>Portfolio Set</title>
 </head>
 <body>
-  <header th:replace="~{fragments/layout :: header}"></header>
+  <header th:replace="~{fragments/layout :: header('portfolio')}"></header>
 
   <main class="site-main set-viewer-main">
     <div class="set-viewer-header" data-aos="fade-up">
@@ -27,7 +27,8 @@
              th:attr="data-index=${iter.index}">
           <div class="thumb-number" th:text="${iter.index + 1}">1</div>
           <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : item.imageUrl}"
-               th:alt="${item.title}">
+               th:alt="${item.title}"
+               loading="lazy" decoding="async">
         </div>
       </nav>
 
@@ -38,7 +39,8 @@
              th:id="'set-item-' + ${iter.index}"
              th:attr="data-index=${iter.index}">
           <img th:src="${item.optimizedUrl != null ? item.optimizedUrl : item.imageUrl}"
-               th:alt="${item.title}">
+               th:alt="${item.title}"
+               loading="lazy" decoding="async">
           <div class="set-viewer-item-info">
             <h3 th:text="${item.title}">Item Title</h3>
             <p th:if="${item.description}" th:text="${item.description}">Description</p>

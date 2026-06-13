@@ -5,7 +5,7 @@
 </head>
 <body class="page-fade-in">
   <div th:replace="~{fragments/layout :: stars}"></div>
-  <header th:replace="~{fragments/layout :: header}"></header>
+  <header th:replace="~{fragments/layout :: header('commissions')}"></header>
 
   <main class="site-main">
     <div class="commissions-container" data-aos="fade-up">
@@ -14,7 +14,10 @@
         Interested in commissioning a piece? Fill out the form below and I'll get back to you as soon as possible.
       </p>
 
-      <form class="commissions-form"
+      <p th:if="${config.commissionsNote != null and !config.commissionsNote.isEmpty()}"
+         class="commissions-note" th:text="${config.commissionsNote}"></p>
+
+      <form class="commissions-form" id="commissionsForm"
             th:data-email="${commissionsEmail}">
         <div class="form-group">
           <label for="name">Name</label>
@@ -54,8 +57,20 @@
           <input type="text" id="budget" name="budget" placeholder="e.g. $50–$200">
         </div>
 
+        <!-- Honeypot: hidden from humans; bots that fill it are dropped silently -->
+        <div class="form-group hp-field" aria-hidden="true">
+          <label for="company">Company</label>
+          <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
+        </div>
+
         <button type="submit" class="btn btn-primary btn-lg">Send Request</button>
       </form>
+
+      <div class="commissions-success" id="commissionsSuccess" hidden>
+        <h2>Your request is ready to send</h2>
+        <p>Your email app should have opened with the details filled in. If nothing happened,
+           email <a th:href="'mailto:' + ${commissionsEmail}" th:text="${commissionsEmail}">us</a> directly.</p>
+      </div>
     </div>
   </main>
 

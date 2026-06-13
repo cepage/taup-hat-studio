@@ -73,9 +73,11 @@ public class SiteGeneratorService {
         site.addJs("js/set-viewer.js", loadStaticAsset("site-assets/set-viewer.js"));
         site.addJs("js/about-carousel.js", loadStaticAsset("site-assets/about-carousel.js"));
         site.addJs("js/commissions-form.js", loadStaticAsset("site-assets/commissions-form.js"));
+        site.addJs("js/portfolio-filter.js", loadStaticAsset("site-assets/portfolio-filter.js"));
 
         // Image assets
         site.addBinary("images/star.png", loadStaticBinaryAsset("site-assets/star.png"), "image/png");
+        site.addBinary("images/favicon.png", loadStaticBinaryAsset("site-assets/favicon.png"), "image/png");
 
         // Home page — resolve latest issue for the first active series
         var latestIssue = activeSeries.isEmpty() ? null
