@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app-check.js';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app-check.js';
 import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 
 (function () {
@@ -15,7 +15,7 @@ import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/fireba
   try {
     var app = initializeApp(window.__FIREBASE_CONFIG__);
     initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(window.__RECAPTCHA_SITE_KEY__),
+      provider: new ReCaptchaEnterpriseProvider(window.__RECAPTCHA_SITE_KEY__),
       isTokenAutoRefreshEnabled: true
     });
     db = getFirestore(app);
@@ -50,11 +50,10 @@ import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/fireba
 
     var subject = 'Commission request — ' + (get('name') || 'New');
     var text = [
-      'Name: '   + get('name'),
-      'Email: '  + get('email'),
-      'Phone: '  + get('phone'),
-      'Type: '   + get('commission-type'),
-      'Budget: ' + get('budget'),
+      'Name: '    + get('name'),
+      'Contact: ' + get('contact'),
+      'Type: '    + get('commission-type'),
+      'Budget: '  + get('budget'),
       '',
       'Description:',
       get('description')
@@ -75,7 +74,7 @@ import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/fireba
 
     addDoc(collection(db, 'mail'), {
       to: email,
-      replyTo: get('email'),
+      replyTo: get('contact').slice(0, 199),
       message: { subject: subject, text: text }
     }).then(function () {
       form.hidden = true;
