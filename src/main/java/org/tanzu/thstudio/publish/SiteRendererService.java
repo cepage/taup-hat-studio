@@ -225,6 +225,7 @@ class SiteRendererService {
         ctx.setVariable("config", config);
         ctx.setVariable("siteName", config.getSiteName());
         ctx.setVariable("adobeFontsUrl", config.getAdobeFontsUrl());
+        ctx.setVariable("googleAnalyticsId", config.getGoogleAnalyticsId());
         ctx.setVariable("year", LocalDateTime.now().getYear());
         ctx.setVariable("generatedAt", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 

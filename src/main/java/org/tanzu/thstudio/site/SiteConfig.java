@@ -57,6 +57,9 @@ public class SiteConfig {
     @Column(columnDefinition = "TEXT")
     private String customFonts;
 
+    @Column(length = 32)
+    private String googleAnalyticsId;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -104,4 +107,7 @@ public class SiteConfig {
 
     public String getCustomFonts() { return customFonts; }
     public void setCustomFonts(String customFonts) { this.customFonts = customFonts; }
+
+    public String getGoogleAnalyticsId() { return googleAnalyticsId; }
+    public void setGoogleAnalyticsId(String googleAnalyticsId) { this.googleAnalyticsId = googleAnalyticsId; }
 }

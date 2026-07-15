@@ -38,6 +38,7 @@ public class SiteConfigService {
         existing.setCommissionsEmail(updated.getCommissionsEmail());
         existing.setAdobeFontsUrl(updated.getAdobeFontsUrl());
         existing.setCustomFonts(updated.getCustomFonts());
+        existing.setGoogleAnalyticsId(updated.getGoogleAnalyticsId());
         // Note: heroImageUrl is managed separately via the hero-image endpoint
         return repository.save(existing);
     }

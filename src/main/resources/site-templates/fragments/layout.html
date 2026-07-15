@@ -10,6 +10,17 @@
 
   <title th:text="${pageTitle} + ' — ' + ${siteName}">Title</title>
 
+  <!-- Google Analytics (GA4) -->
+  <th:block th:if="${googleAnalyticsId != null and !googleAnalyticsId.isEmpty()}">
+    <script th:attr="src='https://www.googletagmanager.com/gtag/js?id=' + ${googleAnalyticsId}" async></script>
+    <script th:inline="javascript">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', /*[[${googleAnalyticsId}]]*/ '');
+    </script>
+  </th:block>
+
   <!-- SEO / social meta -->
   <th:block th:with="desc=${metaDescription != null and !metaDescription.isEmpty()
                             ? metaDescription

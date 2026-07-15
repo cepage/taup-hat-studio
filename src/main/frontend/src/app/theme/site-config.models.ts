@@ -15,6 +15,7 @@ export interface SiteConfig {
   commissionsNote: string | null;
   adobeFontsUrl: string | null;
   customFonts: string | null;
+  googleAnalyticsId: string | null;
 }
 
 export interface SocialLink {
