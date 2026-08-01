@@ -1,7 +1,7 @@
 ---
 applications:
   - name: tauphat
-    memory: 2G
+    memory: 1536M
     instances: 1
     path: target/taup-hat-studio-1.0.0.jar
     routes:
@@ -9,7 +9,12 @@ applications:
     buildpacks:
       - java_buildpack_offline
     env:
-      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+      # stack_threads tells the buildpack's memory calculator how many 1M thread
+      # stacks to reserve before sizing the heap. The default of 250 reserves
+      # ~250M for a single-user app that runs ~50 threads. Lowering it to 80
+      # keeps comfortable margin while returning ~170M to the heap.
+      # Must stay consistent with server.tomcat.threads.max in application-cloud.properties.
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ }, memory_calculator: { stack_threads: 80 } }'
       JAVA_OPTS: '-XX:MaxDirectMemorySize=64m'
       SPRING_PROFILES_ACTIVE: cloud
       GCS_BUCKET_NAME: ((gcs-bucket-name))
