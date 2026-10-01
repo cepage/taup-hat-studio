@@ -35,6 +35,7 @@ export class App {
     { label: 'Dashboard', icon: 'dashboard', route: '/' },
     { label: 'Webcomics', icon: 'menu_book', route: '/webcomics' },
     { label: 'Portfolio', icon: 'photo_library', route: '/portfolio' },
+    { label: 'Commissions', icon: 'mail', route: '/commissions' },
     { label: 'Theme', icon: 'palette', route: '/theme' },
     { label: 'Publish', icon: 'publish', route: '/publish' },
   ]);

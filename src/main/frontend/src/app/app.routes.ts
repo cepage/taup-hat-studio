@@ -31,6 +31,11 @@ export const routes: Routes = [
           import('./portfolio/portfolio-list/portfolio-list').then((m) => m.PortfolioList),
       },
       {
+        path: 'commissions',
+        loadComponent: () =>
+          import('./commissions/commission-inbox/commission-inbox').then((m) => m.CommissionInbox),
+      },
+      {
         path: 'theme',
         loadComponent: () =>
           import('./theme/theme-editor/theme-editor').then((m) => m.ThemeEditor),

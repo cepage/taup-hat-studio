@@ -20,7 +20,8 @@ public class SqlDumpGenerator {
             "portfolio_item",
             "webcomic_series",
             "webcomic_issue",
-            "webcomic_page"
+            "webcomic_page",
+            "commission_request"
     );
 
     public byte[] dump(Connection connection) throws Exception {

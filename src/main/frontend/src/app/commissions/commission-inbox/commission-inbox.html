@@ -1,0 +1,70 @@
+<div class="header">
+  <div>
+    <h1>Commissions</h1>
+    <p class="subtitle">Requests submitted through the site's commissions form.</p>
+  </div>
+  <button mat-icon-button (click)="load()" matTooltip="Refresh" aria-label="Refresh">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="40" />
+    <span>Loading commission requests...</span>
+  </div>
+} @else if (requests().length === 0) {
+  <app-empty-state
+    icon="mail"
+    title="No commission requests yet"
+    description="Requests from the site's commissions form will appear here."
+  />
+} @else {
+  <mat-accordion multi>
+    @for (request of requests(); track request.id) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ title(request) }}</mat-panel-title>
+          <mat-panel-description>
+            <span class="received">{{ request.receivedAt | date: 'medium' }}</span>
+            <span class="status" [class]="'status-' + request.status.toLowerCase()">
+              {{ request.status | titlecase }}
+            </span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <pre class="body">{{ request.body }}</pre>
+
+        @if (request.status === 'FAILED' && request.lastError) {
+          <p class="error">
+            <mat-icon>error</mat-icon>
+            Delivery failed after {{ request.attempts }} attempt(s): {{ request.lastError }}
+          </p>
+        }
+
+        <div class="actions">
+          @if (replyLink(request); as link) {
+            <a mat-flat-button [href]="link">
+              <mat-icon>reply</mat-icon>
+              Reply
+            </a>
+          }
+          @if (request.status === 'FAILED') {
+            <button
+              mat-stroked-button
+              [disabled]="retryingId() === request.id"
+              (click)="retry(request, $event)"
+            >
+              <mat-icon>send</mat-icon>
+              Retry delivery
+            </button>
+          }
+          <button mat-button class="delete" (click)="delete(request, $event)">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+}
